@@ -1,0 +1,492 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Poppins:wght@400;500;700&display=swap');
+
+/* Custom Fonts */
+@font-face {
+  font-family: 'Agoka';
+  src: url('/Agoka.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Carlo';
+  src: url('/Carlo.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Dream Avenue';
+  src: url('/Dream Avenue.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Caviar Dreams';
+  src: url('/CaviarDreams.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Hatton';
+  src: url('/Hatton.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Unica One';
+  src: url('/UnicaOne.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --accent-color: #ff6b6b;
+  --foreground-color: #ffffff;
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+  font-family: 'Space Grotesk', 'Poppins', 'Caviar Dreams', 'Hatton', 'Unica One', 'Agoka', 'Carlo', 'Dream Avenue', sans-serif;
+  background: #15151e;
+  color: #fff;
+  min-height: 100vh;
+}
+
+/* ================================
+   Hide Cursor & Custom Cursors on Mobile
+   ================================ */
+@media (max-width: 767px), (pointer: coarse), (hover: none) {
+  html, body, *, *:before, *:after {
+    cursor: none !important;
+  }
+  .custom-cursor,
+  #custom-cursor,
+  #animated-cursor,
+  [class*="cursor"],
+  [id*="cursor"],
+  [data-cursor] {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+  }
+}
+
+/* ================================
+   Typography Utility Classes
+   ================================ */
+.hero-heading {
+  font-size: 4rem;
+  font-weight: 700;
+  font-family: 'Hatton', 'Space Grotesk', 'Poppins', 'Caviar Dreams', serif;
+}
+
+.text-subheading,
+.placeholder-subheading::placeholder {
+  font-size: 1.25rem;
+  opacity: 0.8;
+  font-family: 'Caviar Dreams', 'Space Grotesk', 'Poppins', sans-serif;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.text-dream {
+  font-family: 'Dream Avenue', cursive;
+  letter-spacing: 0.04em;
+}
+
+.text-accent {
+  color: var(--accent-color);
+}
+
+/* ================================
+   Button Styles
+   ================================ */
+.material-btn {
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: var(--foreground-color);
+  font-family: 'Poppins', 'Carlo', 'Caviar Dreams', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.material-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* ================================
+   Card Styles
+   ================================ */
+.material-card,
+.profile-card {
+  padding: 24px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+/* ================================
+   NowListening Marquee & Responsive
+   ================================ */
+.marquee-scroll {
+  animation: marquee-artist 7s linear infinite;
+  white-space: nowrap;
+  display: inline-block;
+}
+@keyframes marquee-artist {
+  0% { transform: translateX(0); }
+  10% { transform: translateX(0); }
+  90% { transform: translateX(calc(-100% + 75vw)); }
+  100% { transform: translateX(calc(-100% + 75vw)); }
+}
+
+@media (max-width: 767px) {
+  .now-listening-container {
+    max-width: 99vw !important;
+    margin-bottom: 1rem !important;
+    border-radius: 1.15rem !important;
+  }
+  .now-listening-container .thumbnail-wrapper {
+    min-width: 49px !important;
+    min-height: 49px !important;
+  }
+}
+
+.thumbnail-wrapper:hover .thumbnail-img,
+.thumbnail-wrapper:focus .thumbnail-img {
+  transform: scale(1.06);
+  z-index: 3;
+  box-shadow: 0 7px 31px #fff5, 0 2px 10px #9997;
+}
+.thumbnail-img {
+  will-change: transform;
+}
+
+/* ================================
+   NavBar Responsive & Shape & Arrow
+   ================================ */
+@media (max-width: 767px) {
+  #navbar {
+    min-width: 0 !important;
+    max-width: 97vw !important;
+    width: auto !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    padding: 0.25rem 0.5rem !important;
+    border-radius: 1.5rem !important;
+  }
+  #navbar ul {
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+  }
+}
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5em 1.2em;
+  border-radius: 1.3em;
+  transition: background 0.18s, box-shadow 0.18s, color 0.18s;
+  background: transparent;
+  color: #fff;
+  cursor: none;
+}
+.nav-link:focus {
+  outline: none;
+}
+.nav-link .nav-arrow {
+  opacity: 0;
+  transform: translateX(-4px) scale(0.85);
+  margin-left: 0.6em;
+  transition: opacity 0.16s, transform 0.19s;
+  display: inline-flex;
+  align-items: center;
+}
+.nav-link:hover,
+.nav-link:focus {
+  background: rgba(255,255,255,0.13);
+  box-shadow: 0 2px 12px 0 #fff2, 0 0 0 2px #fff3;
+  color: #12121a !important;
+}
+.nav-link:hover .nav-arrow,
+.nav-link:focus .nav-arrow {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+.nav-link .active {
+  color: #b0b0b0 !important;
+}
+/* Hide custom cursor when hovering a nav-link */
+.nav-link:hover ~ .custom-cursor,
+.nav-link:focus ~ .custom-cursor {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* ================================
+   Social Icons: VISIBLE, gradient fallback, NE Arrow Cursor, Ripple
+   ================================ */
+.social-icon {
+  display: inline-flex;
+  align-items: center;
+  font-size: 2rem;
+  background: linear-gradient(90deg, #fff 5%, #b0b0b0 94%, #888 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: #fff; /* fallback for SVG color */
+  position: relative;
+  z-index: 1;
+  cursor: none;
+  transition: transform 0.14s, color 0.14s;
+}
+.social-icon .icon-main svg {
+  color: inherit;
+  width: 2rem;
+  height: 2rem;
+  display: block;
+  filter: drop-shadow(0 2px 8px #fff2);
+  transition: color 0.16s, filter 0.16s;
+  fill: currentColor;
+}
+.social-icon:hover,
+.social-icon:focus {
+  background: linear-gradient(90deg, #fff 40%, #b0b0b0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: #fff;
+}
+.social-icon:hover .icon-main svg,
+.social-icon:focus .icon-main svg {
+  filter: drop-shadow(0 2px 12px #fff8);
+}
+.social-arrow {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%,-50%) rotate(45deg) scale(0);
+  opacity: 0;
+  transition: opacity 0.14s, transform 0.17s;
+  pointer-events: none;
+}
+.social-icon .icon-main {
+  transition: opacity 0.14s, transform 0.15s;
+}
+.social-icon:hover .icon-main,
+.social-icon:focus .icon-main {
+  opacity: 0;
+  transform: scale(0.7);
+}
+.social-icon:hover .social-arrow,
+.social-icon:focus .social-arrow {
+  opacity: 1;
+  transform: translate(-50%,-50%) rotate(45deg) scale(1.13);
+}
+
+/* ================================
+   3-Line Pop Visualizer (NowListening)
+   ================================ */
+.now-listening-container .pop-visualizer {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: flex-end;
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+@media (max-width: 767px) {
+  .now-listening-container .pop-visualizer {
+    gap: 6px;
+  }
+}
+
+/* Wide Box Visualizer (NowListening) */
+.box-wide-visualizer {
+  user-select: none;
+}
+
+/* --- Android 15 style: constant particles blur ripple effect --- */
+.particle-blur-bg {
+  pointer-events: none;
+  position: absolute;
+  left: 0; top: 0; width: 100%; height: 100%;
+  z-index: 0;
+  overflow: hidden;
+}
+.particle-blur-bg .particle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.37;
+  filter: blur(14px);
+  background: radial-gradient(circle,rgba(255,255,255,0.13) 0%,rgba(255,255,255,0.06) 70%,rgba(180,180,220,0.04) 100%);
+  animation: particle-float 4.5s linear infinite;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+.particle-blur-bg .particle.p1 { left: 8%; top: 18%; width: 60px; height: 60px; animation-delay: 0s; }
+.particle-blur-bg .particle.p2 { left: 65%; top: 9%; width: 82px; height: 82px; animation-delay: 1.3s;}
+.particle-blur-bg .particle.p3 { left: 33%; top: 62%; width: 75px; height: 75px; animation-delay: 2.2s;}
+.particle-blur-bg .particle.p4 { left: 77%; top: 72%; width: 44px; height: 44px; animation-delay: 3.1s;}
+.particle-blur-bg .particle.p5 { left: 18%; top: 78%; width: 38px; height: 38px; animation-delay: 1.7s;}
+.particle-blur-bg .particle.p6 { left: 82%; top: 40%; width: 72px; height: 72px; animation-delay: 2.7s;}
+.particle-blur-bg .particle.p7 { left: 41%; top: 33%; width: 52px; height: 52px; animation-delay: 0.8s;}
+.particle-blur-bg .particle.p8 { left: 60%; top: 53%; width: 40px; height: 40px; animation-delay: 2.5s;}
+
+@keyframes particle-float {
+  0%   { transform: scale(1) translateY(0px); opacity: 0.22; }
+  18%  { opacity: 0.4; }
+  50%  { transform: scale(1.18) translateY(-14px); opacity: 0.46; }
+  80%  { opacity: 0.25; }
+  100% { transform: scale(1) translateY(0px); opacity: 0.22; }
+}
+
+/* ================================
+   Equalizer Bars (for SoftEqualizer)
+   ================================ */
+.equalizer-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  height: 18px;
+  min-width: 22px;
+}
+.equalizer-bar {
+  width: 5px;
+  border-radius: 4px;
+  background: linear-gradient(90deg,#fff 80%,#b0b0b0 100%);
+  opacity: 0.8;
+  animation: eq-bar 1s infinite ease-in-out;
+}
+.equalizer-bar.bar2 { animation-delay: 0.19s;}
+.equalizer-bar.bar3 { animation-delay: 0.33s;}
+@keyframes eq-bar {
+  0% { height: 8px;}
+  20% { height: 18px;}
+  40% { height: 8px;}
+  60% { height: 12px;}
+  80% { height: 16px;}
+  100% { height: 8px;}
+}
+
+/* Glassmorphic Navbar */
+.glass-navbar {
+  background: linear-gradient(120deg, rgba(30,32,40,0.86) 70%, rgba(255,255,255,0.12) 100%);
+  border: 1.8px solid rgba(255,255,255,0.22);
+  box-shadow: 0 6px 24px 0 rgba(25, 25, 37, 0.18), 0 2px 32px 0 rgba(255,255,255,0.09);
+  backdrop-filter: blur(22px) saturate(1.4);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+}
+
+/* Improved NavBar Hover */
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5em 1.2em;
+  border-radius: 1.3em;
+  transition: 
+    background 0.19s cubic-bezier(.61,.13,.45,.87),
+    box-shadow 0.18s,
+    color 0.19s,
+    transform 0.18s;
+  background: transparent;
+  color: #fff;
+  cursor: none;
+}
+.nav-link:focus {
+  outline: none;
+}
+.nav-link .nav-arrow {
+  opacity: 0;
+  transform: translateX(-4px) scale(0.85);
+  margin-left: 0.6em;
+  transition: opacity 0.17s, transform 0.19s;
+  display: inline-flex;
+  align-items: center;
+}
+.nav-link:hover,
+.nav-link:focus {
+  background: linear-gradient(90deg,rgba(255,255,255,0.09) 65%,rgba(255,255,255,0.28) 100%);
+  box-shadow: 0 2px 16px 0 #fff1, 0 0 0 2px #fff2;
+  color: #fff !important;
+  transform: scale(1.10);
+  border-radius: 2em;
+}
+.nav-link:hover .nav-arrow,
+.nav-link:focus .nav-arrow {
+  opacity: 1;
+  transform: translateX(0) scale(1.09);
+}
+.nav-link .active {
+  color: #c0c0c0 !important;
+  text-shadow: 0 2px 8px #fff5;
+}
+
+/* ================
+   Appearing Effect
+   ================ */
+
+/* REMOVE all fade-in/appearing effect: these classes now do nothing */
+.fade-in,
+.fade-in-up,
+.fade-in-down,
+.fade-in-left,
+.fade-in-right,
+.fade-in-scale,
+.fade-in.visible,
+.fade-in-up.visible,
+.fade-in-down.visible,
+.fade-in-left.visible,
+.fade-in-right.visible,
+.fade-in-scale.visible {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* Animated underline for navbar */
+.navbar-underline {
+  pointer-events: none;
+  background: linear-gradient(90deg, #fff 70%, #e4e4e7 100%);
+  height: 3px;
+  border-radius: 2px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  opacity: 1;
+  transition:
+    left 0.33s cubic-bezier(.62,.04,.31,1.09),
+    width 0.23s cubic-bezier(.62,.04,.31,1.09),
+    opacity 0.2s;
+  z-index: 2;
+  box-shadow: 0 2px 12px #fff2;
+}
+
+@media (max-width: 767px) {
+  .navbar-underline {
+    display: none !important;
+    opacity: 0 !important;
+  }
+}

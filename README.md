@@ -1,2 +1,8 @@
-# tanujairamv.github.io
-🚀 Welcome to my personal portfolio website – the one-stop destination to know everything about my dev journey, projects, and skills!
+# Tanujairam's Portfolio
+
+Simple portfolio made with React, TailwindCSS, and Framer Motion.  
+Deployed via Vercel 🚀
+
+## Commands
+- `npm start` — Run locally
+- `npm run build` — Build for production
