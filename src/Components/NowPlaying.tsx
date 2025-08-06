@@ -1,23 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { fetchRecentTrack, LastFMTrack } from "../Data/lastFmApi";
 import { FaMusic } from "react-icons/fa";
+import { TrackInfo } from "../Data/types";
 
-// iTunes fallback
-async function getItunesThumbnail(artist: string, track: string): Promise<string | null> {
-  try {
-    const query = encodeURIComponent(`${artist} ${track}`);
-    const itunesRes = await fetch(`https://itunes.apple.com/search?term=${query}&entity=song&limit=1`);
-    const itunesData = await itunesRes.json();
-    if (itunesData.results?.[0]?.artworkUrl100) {
-      return itunesData.results[0].artworkUrl100.replace("100x100bb.jpg", "400x400bb.jpg");
-    }
-  } catch (e) {
-    console.error("[Debug] Error fetching iTunes thumbnail:", e);
-  }
-  return null;
+interface SpotifyNowPlaying {
+  isPlaying: boolean;
+  title: string;
+  artist: string;
+  album: string;
+  albumImageUrl: string;
+  songUrl: string;
+  progress: number | null;
+  duration: number;
+  playedAt?: string;
 }
 
-const fallbackTrack: LastFMTrack = {
+const fallbackTrack: TrackInfo = {
   artist: "",
   name: "Not playing",
   album: "",
@@ -92,38 +89,82 @@ const isMobile = () =>
     window.innerWidth < 768);
 
 const NowListening: React.FC = () => {
-  const [track, setTrack] = useState<LastFMTrack | null>(null);
+  const [track, setTrack] = useState<TrackInfo | null>(null);
   const [img, setImg] = useState<string>(fallbackTrack.image);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [mobileView, setMobileView] = useState(isMobile());
+  const [headerText, setHeaderText] = useState("Now Listening");
+  const [showVisualizer, setShowVisualizer] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
-    fetchRecentTrack()
-      .then(async (t: LastFMTrack) => {
-        if (!isMounted) return;
-        // Debug
-        console.debug("[Debug] Recent track fetched:", t);
+    const fetchSpotifyNowPlaying = async () => {
+      if (!isMounted) return;
+      fetch("https://spotify-now-playing-alpha.vercel.app/api/now-playing")
+        .then(response => {
+          if (!response.ok) throw new Error(`Spotify API error: ${response.status}`);
+          return response.json();
+        })
+        .then(async (data: SpotifyNowPlaying) => {
+          if (!isMounted) return;
+          console.debug("[Debug] Spotify data fetched:", data);
 
-        setTrack(t);
+          // If a track title is present, we have something to show.
+          if (data.title) {
+            const newTrack: TrackInfo = {
+              name: data.title,
+              artist: data.artist,
+              album: data.album,
+              image: data.albumImageUrl,
+              url: data.songUrl,
+              progressMs: data.progress === null ? undefined : data.progress,
+              durationMs: data.duration,
+            };
 
-        const thumb = await getItunesThumbnail(t.artist, t.name);
-        if (thumb) {
-          console.debug("[Debug] Using iTunes thumbnail:", thumb);
-          setImg(thumb);
-        } else {
-          console.debug("[Debug] Using fallback image");
+            // Update header and visualizer based on playing status
+            setHeaderText(data.isPlaying ? "Now Listening" : "Recently Played");
+            setShowVisualizer(data.isPlaying);
+
+            setTrack(currentTrack => {
+              // Only update image if the song has changed
+              if (currentTrack?.url !== newTrack.url) {
+                setImg(newTrack.image || fallbackTrack.image);
+                setImgLoaded(false);
+                return newTrack;
+              }
+              return currentTrack;
+            });
+          } else {
+            // Nothing is playing and no recent track available
+            setTrack(currentTrack => {
+              if (currentTrack !== null) {
+                setImg(fallbackTrack.image);
+                setImgLoaded(true);
+              }
+              return null;
+            });
+            setHeaderText("Now Listening");
+            setShowVisualizer(false);
+          }
+        })
+        .catch(err => {
+          console.error("[Debug] Error fetching Spotify now playing track:", err);
+          if (!isMounted) return;
+          setTrack(null);
           setImg(fallbackTrack.image);
-        }
-      })
-      .catch((err) => {
-        console.error("[Debug] Error fetching recent track:", err);
-        if (!isMounted) return;
-        setTrack(null);
-        setImg(fallbackTrack.image);
-      });
+          setImgLoaded(true);
+          setHeaderText("Now Listening");
+          setShowVisualizer(false);
+        });
+    };
+
+    fetchSpotifyNowPlaying();
+    const intervalId = setInterval(fetchSpotifyNowPlaying, 30000); // Poll every 30 seconds
+
     return () => {
       isMounted = false;
+      clearInterval(intervalId);
     };
   }, []);
 
@@ -133,13 +174,48 @@ const NowListening: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const t: LastFMTrack = track || fallbackTrack;
+  // Progress bar timer
+  useEffect(() => {
+    if (!showVisualizer || !track?.durationMs || typeof track.progressMs !== 'number') {
+      setProgress(0);
+      return;
+    }
+
+    let interval: NodeJS.Timeout;
+    const { durationMs } = track;
+    let currentProgress = track.progressMs;
+
+    const tick = () => {
+      currentProgress += 1000;
+      if (currentProgress > durationMs) {
+        currentProgress = durationMs;
+        clearInterval(interval);
+      }
+      setProgress((currentProgress / durationMs) * 100);
+    };
+
+    // Set initial progress and start timer
+    setProgress((currentProgress / durationMs) * 100);
+    interval = setInterval(tick, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [track, showVisualizer]);
+
+  const t: TrackInfo = track || fallbackTrack;
   const blurStrength = mobileView ? 7 : 11;
 
   // Debug: Log when component renders and what image is used
   useEffect(() => {
     console.debug("[Debug] NowListening component rendered. Img:", img, "Track:", t);
   }, [img, t]);
+
+  const handleContainerClick = () => {
+    if (t.url && t.url !== "#") {
+      window.open(t.url, "_blank", "noopener,noreferrer");
+    }
+  };
 
   return (
     <div
@@ -157,6 +233,7 @@ const NowListening: React.FC = () => {
         cursor: "pointer"
       }}
       tabIndex={0}
+      onClick={handleContainerClick}
     >
       {/* Constant Particles Blur Ripple Android 15 style */}
       <span className="particle-blur-bg" aria-hidden="true">
@@ -176,27 +253,18 @@ const NowListening: React.FC = () => {
           backgroundImage: `url(${img})`,
           backgroundPosition: "center",
           backgroundSize: "cover",
-          filter: `blur(${blurStrength}px) brightness(0.74) saturate(1.3)`,
-          WebkitFilter: `blur(${blurStrength}px) brightness(0.74) saturate(1.3)`,
-          transform: "scale(1.09)",
-          opacity: 0.95
+          transform: "scale(1.15)",
+          opacity: 0.8
         }}
         aria-hidden
-      />
-      {/* Overlay */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          background: "rgba(18,18,30,0.37)",
-          backdropFilter: "blur(1px) saturate(1.08)",
-          WebkitBackdropFilter: "blur(1px) saturate(1.08)"
-        }}
       />
       {/* Main content */}
       <div
         className={`relative z-10 flex items-center ${mobileView ? "gap-2 px-2.5 py-2.5" : "gap-7 px-8 py-6"}`}
         style={{
-          background: "rgba(255,255,255,0.07)",
+          background: "rgba(25, 28, 42, 0.55)",
+          backdropFilter: "blur(18px) saturate(1.4)",
+          WebkitBackdropFilter: "blur(18px) saturate(1.4)",
           borderRadius: mobileView ? "1.15rem" : "2rem",
           border: "1.5px solid rgba(180,180,180,0.16)",
           minHeight: mobileView ? "80px" : "120px",
@@ -263,7 +331,7 @@ const NowListening: React.FC = () => {
               opacity: 0.91
             }}
           >
-            Now Listening
+            {headerText}
           </span>
           <span
             className="truncate font-bold text-[1.15rem] md:text-[1.24rem] max-w-full relative"
@@ -295,7 +363,32 @@ const NowListening: React.FC = () => {
           >
             {t.artist}
           </span>
-          <BoxWideVisualizer mobile={mobileView} />
+          {showVisualizer && <BoxWideVisualizer mobile={mobileView} />}
+          {showVisualizer && track?.durationMs && (
+            <div
+              className="progress-bar-container"
+              style={{
+                width: "100%",
+                height: mobileView ? 3 : 4,
+                backgroundColor: "rgba(255, 255, 255, 0.2)",
+                borderRadius: 4,
+                marginTop: mobileView ? 9 : 13,
+                overflow: "hidden",
+              }}
+            >
+              <div
+                className="progress-bar-inner"
+                style={{
+                  height: "100%",
+                  width: `${progress}%`,
+                  backgroundColor: "#fff",
+                  borderRadius: 4,
+                  transition: "width 1s linear",
+                  boxShadow: "0 0 10px 0 #fff8",
+                }}
+              />
+            </div>
+          )}
         </div>
         {/* Music Icon right */}
         <span style={{

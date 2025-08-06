@@ -5,6 +5,16 @@ export interface TrackData {
   imageUrl: string;
 }
 
+export interface TrackInfo {
+  artist: string;
+  name: string;
+  album: string;
+  image: string;
+  url: string;
+  progressMs?: number;
+  durationMs?: number;
+}
+
 export interface Project {
   name: string;
   url: string;
