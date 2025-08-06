@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaMusic } from "react-icons/fa";
 import { TrackInfo } from "../Data/types";
+import TiltedCard from "./TiltedCard";
 
 interface SpotifyNowPlaying {
   isPlaying: boolean;
@@ -218,191 +219,214 @@ const NowListening: React.FC = () => {
   };
 
   return (
-    <div
-      className={`now-listening-container relative w-full mx-auto mb-8 ${mobileView ? "mobile" : ""}`}
-      style={{
-        maxWidth: mobileView ? "100vw" : "460px",
-        borderRadius: mobileView ? "1.15rem" : "2rem",
-        overflow: "hidden",
-        boxShadow: mobileView
-          ? "0 4px 16px rgba(60,60,60,0.14), 0 1px 6px rgba(200,200,200,0.07)"
-          : "0 6px 22px rgba(60,60,60,0.12), 0 2px 10px rgba(200,200,200,0.08)",
-        fontFamily: "'Space Grotesk', 'Poppins', 'Montserrat', sans-serif",
-        background: "rgba(255,255,255,0.05)",
-        position: "relative",
-        cursor: "pointer"
-      }}
-      tabIndex={0}
+    <TiltedCard
+      className={`now-listening-wrapper mx-auto ${mobileView ? "mb-4" : "mb-8"} ${t.url && t.url !== "#" ? "cursor-pointer" : ""}`}
+      containerWidth={mobileView ? "calc(100% - 2rem)" : "460px"}
+      containerHeight="auto"
+      showMobileWarning={false}
+      showTooltip={false}
+      scaleOnHover={mobileView ? 1 : 1.04}
+      rotateAmplitude={mobileView ? 0 : 5}
       onClick={handleContainerClick}
+      tabIndex={0}
     >
-      {/* Constant Particles Blur Ripple Android 15 style */}
-      <span className="particle-blur-bg" aria-hidden="true">
-        <span className="particle p1"></span>
-        <span className="particle p2"></span>
-        <span className="particle p3"></span>
-        <span className="particle p4"></span>
-        <span className="particle p5"></span>
-        <span className="particle p6"></span>
-        <span className="particle p7"></span>
-        <span className="particle p8"></span>
-      </span>
-      {/* Blurred thumbnail bg */}
       <div
-        className="absolute inset-0 z-0"
+        className={`now-listening-container relative w-full`}
         style={{
-          backgroundImage: `url(${img})`,
-          backgroundPosition: "center",
-          backgroundSize: "cover",
-          transform: "scale(1.15)",
-          opacity: 0.8
-        }}
-        aria-hidden
-      />
-      {/* Main content */}
-      <div
-        className={`relative z-10 flex items-center ${mobileView ? "gap-2 px-2.5 py-2.5" : "gap-7 px-8 py-6"}`}
-        style={{
-          background: "rgba(25, 28, 42, 0.55)",
-          backdropFilter: "blur(18px) saturate(1.4)",
-          WebkitBackdropFilter: "blur(18px) saturate(1.4)",
           borderRadius: mobileView ? "1.15rem" : "2rem",
-          border: "1.5px solid rgba(180,180,180,0.16)",
-          minHeight: mobileView ? "80px" : "120px",
-          boxShadow: "0 1px 8px 0 rgba(100,100,100,0.08)",
-          transition: "background 0.2s, box-shadow 0.2s"
+          overflow: "hidden",
+          boxShadow: mobileView
+            ? "0 4px 16px rgba(60,60,60,0.14), 0 1px 6px rgba(200,200,200,0.07)"
+            : "0 6px 22px rgba(60,60,60,0.12), 0 2px 10px rgba(200,200,200,0.08)",
+          fontFamily: "'Space Grotesk', 'Poppins', 'Montserrat', sans-serif",
+          background: "rgba(255,255,255,0.05)",
+          position: "relative",
         }}
       >
-        {/* Album art */}
+        {/* Constant Particles Blur Ripple Android 15 style */}
+        <span className="particle-blur-bg" aria-hidden="true">
+          <span className="particle p1"></span>
+          <span className="particle p2"></span>
+          <span className="particle p3"></span>
+          <span className="particle p4"></span>
+          <span className="particle p5"></span>
+          <span className="particle p6"></span>
+          <span className="particle p7"></span>
+          <span className="particle p8"></span>
+        </span>
+        {/* Blurred thumbnail bg */}
         <div
+          className="absolute inset-0 z-0"
           style={{
-            position: "relative",
-            flexShrink: 0,
-            width: mobileView ? "62px" : "98px",
-            height: mobileView ? "62px" : "98px",
-            borderRadius: mobileView ? "1.15rem" : "1.9rem",
-            overflow: "hidden",
-            transition: "box-shadow .19s, transform .19s"
+            backgroundImage: `url(${img})`,
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+            transform: "scale(1.15)",
+            opacity: 0.8
           }}
-          className="thumbnail-wrapper group"
+          aria-hidden
+        />
+        {/* Main content */}
+        <div
+          className={`relative z-10 flex items-center ${mobileView ? "gap-2 px-2.5 py-2.5" : "gap-7 px-8 py-6"}`}
+          style={{
+            background: "rgba(25, 28, 42, 0.55)",
+            backdropFilter: "blur(18px) saturate(1.4)",
+            WebkitBackdropFilter: "blur(18px) saturate(1.4)",
+            borderRadius: mobileView ? "1.15rem" : "1.9rem",
+            border: "1.5px solid rgba(180,180,180,0.16)",
+            minHeight: mobileView ? "80px" : "120px",
+            boxShadow: "0 1px 8px 0 rgba(100,100,100,0.08)",
+            transition: "background 0.2s, box-shadow 0.2s"
+          }}
         >
-          <img
-            src={img}
-            alt={`Album art for ${t.name}`}
-            className="object-cover thumbnail-img"
+          {/* Album art */}
+          <div
             style={{
-              width: "100%",
-              height: "100%",
+              position: "relative",
+              flexShrink: 0,
+              width: mobileView ? "68px" : "104px",
+              height: mobileView ? "68px" : "104px",
               borderRadius: mobileView ? "1.15rem" : "1.9rem",
-              border: mobileView ? "1.1px solid rgba(225,225,225,0.11)" : "2px solid rgba(225,225,225,0.16)",
-              boxShadow: "0 3px 11px 0 rgba(80,80,80,0.09), 0 1px 7px #fff2",
-              opacity: imgLoaded ? 1 : 0,
-              transition: "opacity .35s, transform .23s cubic-bezier(.33,1.4,.55,1)",
-              zIndex: 2
+              overflow: "hidden",
+              transition: "box-shadow .19s, transform .19s"
             }}
-            onLoad={() => setImgLoaded(true)}
-            tabIndex={mobileView ? -1 : 0}
-            onError={() => {
-              console.warn("[Debug] Image failed to load, using fallback.");
-              setImg(fallbackTrack.image);
-              setImgLoaded(true);
-            }}
-          />
-          {!imgLoaded && (
-            <div style={{
-              width: "100%",
-              height: "100%",
-              borderRadius: mobileView ? "1.15rem" : "1.9rem",
-              background: "linear-gradient(135deg,#e8e8e8 10%,#bbb 90%)",
-              position: "absolute", left: 0, top: 0
-            }} />
-          )}
-        </div>
-        {/* Info block */}
-        <div className="flex flex-col min-w-0 flex-1" style={{ marginLeft: mobileView ? 10 : 22, position: "relative" }}>
-          <span
-            className="text-[0.75rem] uppercase tracking-widest mb-1"
-            style={{
-              background: "linear-gradient(90deg, #fff 55%, #b0b0b0 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              fontFamily: "'Space Grotesk', 'Poppins', sans-serif",
-              letterSpacing: "0.15em",
-              fontWeight: 600,
-              opacity: 0.91
-            }}
+            className="thumbnail-wrapper group"
           >
-            {headerText}
-          </span>
-          <span
-            className="truncate font-bold text-[1.15rem] md:text-[1.24rem] max-w-full relative"
-            style={{
-              background: "linear-gradient(90deg, #fff 75%, #b0b0b0 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              fontFamily: "'Space Grotesk', 'Poppins', sans-serif",
-              fontWeight: 700,
-              lineHeight: 1.17,
-              maxWidth: "100%",
-              letterSpacing: "0.01em",
-              overflow: "hidden"
-            }}
-          >
-            {t.name}
-          </span>
-          <span
-            className="truncate text-[1.03rem] md:text-[1.11rem] font-semibold mt-1"
-            style={{
-              background: "linear-gradient(90deg, #fff 45%, #b0b0b0 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              fontFamily: "'Space Grotesk', 'Poppins', sans-serif",
-              lineHeight: 1.13,
-              maxWidth: "100%",
-              fontWeight: 500
-            }}
-          >
-            {t.artist}
-          </span>
-          {showVisualizer && <BoxWideVisualizer mobile={mobileView} />}
-          {showVisualizer && track?.durationMs && (
-            <div
-              className="progress-bar-container"
+            <img
+              src={img}
+              alt={`Album art for ${t.name}`}
+              className="object-cover thumbnail-img"
               style={{
                 width: "100%",
-                height: mobileView ? 3 : 4,
-                backgroundColor: "rgba(255, 255, 255, 0.2)",
-                borderRadius: 4,
-                marginTop: mobileView ? 9 : 13,
-                overflow: "hidden",
+                height: "100%",
+                borderRadius: mobileView ? "1.15rem" : "1.9rem",
+                border: mobileView ? "1.1px solid rgba(225,225,225,0.11)" : "2px solid rgba(225,225,225,0.16)",
+                boxShadow: "0 3px 11px 0 rgba(80,80,80,0.09), 0 1px 7px #fff2",
+                opacity: imgLoaded ? 1 : 0,
+                transition: "opacity .35s, transform .23s cubic-bezier(.33,1.4,.55,1)",
+                zIndex: 2
+              }}
+              onLoad={() => setImgLoaded(true)}
+              tabIndex={mobileView ? -1 : 0}
+              onError={() => {
+                console.warn("[Debug] Image failed to load, using fallback.");
+                setImg(fallbackTrack.image);
+                setImgLoaded(true);
+              }}
+            />
+            {!imgLoaded && (
+              <div style={{
+                width: "100%",
+                height: "100%",
+                borderRadius: mobileView ? "1.15rem" : "1.9rem",
+                background: "linear-gradient(135deg,#e8e8e8 10%,#bbb 90%)",
+                position: "absolute", left: 0, top: 0
+              }} />
+            )}
+          </div>
+          {/* Info block */}
+          <div className="flex flex-col min-w-0 flex-1" style={{ marginLeft: mobileView ? 10 : 22, position: "relative" }}>
+            <span
+              className="text-[0.75rem] uppercase tracking-widest mb-1"
+              style={{
+                background: "linear-gradient(90deg, #fff 55%, #b0b0b0 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                fontFamily: "'Space Grotesk', 'Poppins', sans-serif",
+                letterSpacing: "0.15em",
+                fontWeight: 600,
+                opacity: 0.91
               }}
             >
+              {headerText}
+            </span>
+            <span
+              className="truncate font-bold text-[1.15rem] md:text-[1.24rem] max-w-full relative"
+              style={{
+                background: "linear-gradient(90deg, #fff 75%, #b0b0b0 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                fontFamily: "'Space Grotesk', 'Poppins', sans-serif",
+                fontWeight: 700,
+                lineHeight: 1.17,
+                maxWidth: "100%",
+                letterSpacing: "0.01em",
+                overflow: "hidden"
+              }}
+            >
+              {t.name}
+            </span>
+            <span
+              className="truncate text-[1.03rem] md:text-[1.11rem] font-semibold mt-1"
+              style={{
+                background: "linear-gradient(90deg, #fff 45%, #b0b0b0 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                fontFamily: "'Space Grotesk', 'Poppins', sans-serif",
+                lineHeight: 1.13,
+                maxWidth: "100%",
+                fontWeight: 500
+              }}
+            >
+              {t.artist}
+            </span>
+            {showVisualizer && <BoxWideVisualizer mobile={mobileView} />}
+            {showVisualizer && track?.durationMs && (
               <div
-                className="progress-bar-inner"
+                className="progress-bar-container"
                 style={{
-                  height: "100%",
-                  width: `${progress}%`,
-                  backgroundColor: "#fff",
+                  position: "relative",
+                  width: "100%",
+                  height: mobileView ? 3 : 4,
+                  backgroundColor: "rgba(255, 255, 255, 0.2)",
                   borderRadius: 4,
-                  transition: "width 1s linear",
-                  boxShadow: "0 0 10px 0 #fff8",
+                  marginTop: mobileView ? 9 : 13,
                 }}
-              />
-            </div>
-          )}
+              >
+                <div
+                  className="progress-bar-inner"
+                  style={{
+                    height: "100%",
+                    width: `${progress}%`,
+                    backgroundColor: "#fff",
+                    borderRadius: 4,
+                    transition: "width 1s linear",
+                    boxShadow: "0 0 10px 0 #fff8",
+                  }}
+                />
+                <div
+                  className="progress-bar-pin"
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: `${progress}%`,
+                    width: mobileView ? 10 : 12,
+                    height: mobileView ? 10 : 12,
+                    borderRadius: "50%",
+                    backgroundColor: "#fff",
+                    transform: "translate(-50%, -50%)",
+                    transition: "left 1s linear",
+                    boxShadow: "0 0 8px 1px rgba(255, 255, 255, 0.7)",
+                  }}
+                />
+              </div>
+            )}
+          </div>
+          {/* Music Icon right */}
+          <span style={{
+            color: "#fff",
+            fontSize: mobileView ? 22 : 32,
+            marginLeft: mobileView ? 7 : 15,
+            filter: "drop-shadow(0 2px 6px #fff5)",
+            opacity: 0.92,
+            flexShrink: 0
+          }}>
+            <FaMusic />
+          </span>
         </div>
-        {/* Music Icon right */}
-        <span style={{
-          color: "#fff",
-          fontSize: mobileView ? 22 : 32,
-          marginLeft: mobileView ? 7 : 15,
-          filter: "drop-shadow(0 2px 6px #fff5)",
-          opacity: 0.92,
-          flexShrink: 0
-        }}>
-          <FaMusic />
-        </span>
       </div>
-    </div>
+    </TiltedCard>
   );
 };
 
