@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "./Intro.css";
 
 // Scramble animation settings
 const SCRAMBLE_TEXT = "Tanujairam V";
@@ -71,63 +70,82 @@ const Intro: React.FC<{ onFinish?: () => void }> = ({ onFinish }) => {
   if (!show) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black hide-cursor"
-      style={{
-        minHeight: "100vh",
-        minWidth: "100vw",
-        overflow: "hidden",
-      }}
-    >
+    <>
+      <style>{`
+        .hide-cursor, .hide-cursor * {
+          cursor: none !important;
+        }
+
+        /* Hide custom cursor (dot, ring, view) when Intro is open */
+        [data-intro-hide-cursor] .custom-cursor-dot,
+        [data-intro-hide-cursor] .custom-cursor-ring,
+        [data-intro-hide-cursor] .custom-cursor-view {
+          opacity: 0 !important;
+          pointer-events: none !important;
+        }
+
+        /* Prevent letter descenders from being clipped in the Intro title */
+        .intro-title {
+          overflow: visible !important;
+          line-height: 1.15 !important;
+          padding-bottom: 0.18em !important;
+        }
+      `}</style>
       <div
-        className="absolute inset-0"
+        className="fixed inset-0 z-[9999] flex items-center justify-center bg-black hide-cursor"
         style={{
-          background: "#000",
-          filter: "blur(32px)",
-          WebkitBackdropFilter: "blur(32px)",
-          backdropFilter: "blur(32px)",
-          zIndex: 1,
-        }}
-        aria-hidden
-      />
-      <div
-        className="relative z-10 flex flex-col items-center"
-        style={{
-          padding: "2.8rem 3.2rem",
-          borderRadius: "2.2rem",
-          background: "rgba(10,10,10,0.50)",
-          boxShadow: "0 8px 60px 0 #111a, 0 1px 10px #fff1",
+          minHeight: "100vh",
+          minWidth: "100vw",
+          overflow: "hidden",
         }}
       >
-        <h1
-          className="text-4xl md:text-6xl font-bold text-center intro-title"
+        <div
+          className="absolute inset-0"
           style={{
-            background: "linear-gradient(90deg, #fff 60%, #b0b0b0 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            fontFamily: "'Outfit', 'Plus Jakarta Sans', 'Montserrat', 'Quicksand', sans-serif",
-            letterSpacing: "0.07em",
-            userSelect: "none",
-            textShadow: "0 4px 40px #000a",
-            overflow: "visible",              // Fix clipped descenders
-            lineHeight: 1.15,                 // Improve descender visibility (e.g. for "j")
-            paddingBottom: "0.18em",          // Extra space for descenders like "j"
+            background: "#000",
+            filter: "blur(32px)",
+            WebkitBackdropFilter: "blur(32px)",
+            backdropFilter: "blur(32px)",
+            zIndex: 1,
+          }}
+          aria-hidden
+        />
+        <div
+          className="relative z-10 flex flex-col items-center"
+          style={{
+            padding: "2.8rem 3.2rem",
+            borderRadius: "2.2rem",
+            background: "rgba(10,10,10,0.50)",
+            boxShadow: "0 8px 60px 0 #111a, 0 1px 10px #fff1",
           }}
         >
-          {scramble(SCRAMBLE_TEXT, scrambleProgress)}
-        </h1>
-        <p
-          className="mt-6 max-w-xl text-center text-lg md:text-2xl text-gray-400 font-normal"
-          style={{
-            fontFamily: "'Outfit', 'Plus Jakarta Sans', 'Montserrat', 'Quicksand', sans-serif",
-            textShadow: "0 2px 20px #000a",
-          }}
-        >
-          I build software and digital experiences.<br />
-          Currently focused on web, cloud, and AI.
-        </p>
+          <h1
+            className="text-4xl md:text-6xl font-bold text-center intro-title"
+            style={{
+              background: "linear-gradient(90deg, #fff 60%, #b0b0b0 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              fontFamily: "'Outfit', 'Plus Jakarta Sans', 'Montserrat', 'Quicksand', sans-serif",
+              letterSpacing: "0.07em",
+              userSelect: "none",
+              textShadow: "0 4px 40px #000a",
+            }}
+          >
+            {scramble(SCRAMBLE_TEXT, scrambleProgress)}
+          </h1>
+          <p
+            className="mt-6 max-w-xl text-center text-lg md:text-2xl text-gray-400 font-normal"
+            style={{
+              fontFamily: "'Outfit', 'Plus Jakarta Sans', 'Montserrat', 'Quicksand', sans-serif",
+              textShadow: "0 2px 20px #000a",
+            }}
+          >
+            I build software and digital experiences.<br />
+            Currently focused on web, cloud, and AI.
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import "./Cursor.css";
 
 // Helpers
 function isSpecialTile(el: Element | null): boolean {
@@ -32,7 +31,7 @@ const Cursor: React.FC = () => {
   const [isCursorVisible, setIsCursorVisible] = useState(true);
 
   const mouse = useRef({ x: 0, y: 0 });
-  const ring = useRef({ x: 0, y: 0 });
+  const ring = useRef({ x: 0, y: 0, scale: 1 });
   const animationFrame = useRef<number>();
 
   useEffect(() => {
@@ -63,11 +62,17 @@ const Cursor: React.FC = () => {
     const lerp = (a: number, b: number, n: number) => a + (b - a) * n;
 
     const animate = () => {
+      const isHovering = ringRef.current?.classList.contains("cursor-hover");
+      const targetScale = isHovering ? 1.4 : 1;
+
       ring.current.x = lerp(ring.current.x, mouse.current.x, 0.2);
       ring.current.y = lerp(ring.current.y, mouse.current.y, 0.2);
+      ring.current.scale = lerp(ring.current.scale, targetScale, 0.2);
 
       if (ringRef.current) {
-        ringRef.current.style.transform = `translate3d(${ring.current.x - 22}px, ${ring.current.y - 22}px, 0)`;
+        // Center the 50px ring on the cursor and apply scale
+        const transform = `translate3d(${ring.current.x - 25}px, ${ring.current.y - 25}px, 0) scale(${ring.current.scale})`;
+        ringRef.current.style.transform = transform;
         ringRef.current.style.opacity = showView || !isCursorVisible ? "0" : "1";
       }
 
@@ -153,6 +158,60 @@ const Cursor: React.FC = () => {
 
   return (
     <>
+      <style>{`
+        .custom-cursor-ring {
+          position: fixed;
+          pointer-events: none;
+          border: 2px solid #fff;
+          border-radius: 50%;
+          width: 50px;
+          height: 50px;
+          /* Lerp in JS handles transform, CSS handles the rest */
+          transition: opacity 0.3s, border-width 0.3s, box-shadow 0.3s;
+          z-index: 9999;
+          mix-blend-mode: difference;
+          /* Add the glow effect */
+          box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .custom-cursor-ring.cursor-hover {
+          /* JS reads this class to trigger scale animation */
+          border-width: 1px;
+          /* Intensify glow on hover */
+          box-shadow: 0 0 15px rgba(255, 255, 255, 0.7), 0 0 30px rgba(255, 255, 255, 0.4);
+        }
+
+        .custom-cursor-dot {
+          position: fixed;
+          pointer-events: none;
+          background: #fff;
+          border-radius: 50%;
+          width: 9px;
+          height: 9px;
+          transition: opacity 0.2s, box-shadow 0.3s;
+          z-index: 10000;
+          mix-blend-mode: difference;
+          /* Add a subtle glow to the dot */
+          box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+        }
+
+        .custom-cursor-view {
+          position: fixed;
+          pointer-events: none;
+          z-index: 10000;
+          background-color: #fff;
+          color: #111;
+          font-size: 1rem;
+          font-weight: 600;
+          padding: 0.5rem 1rem;
+          border-radius: 1.5rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          opacity: 0;
+          font-family: 'Space Grotesk', 'Poppins', sans-serif;
+        }
+      `}</style>
       <div ref={ringRef} className="custom-cursor-ring" />
       <div ref={dotRef} className="custom-cursor-dot" />
       <div ref={viewRef} className="custom-cursor-view">
