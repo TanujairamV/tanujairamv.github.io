@@ -414,6 +414,65 @@ const NowListening: React.FC = () => {
           </span>
         </div>
       </div>
+      <style>{`
+        .box-wide-visualizer {
+          user-select: none;
+        }
+        .thumbnail-wrapper:hover .thumbnail-img,
+        .thumbnail-wrapper:focus .thumbnail-img {
+          transform: scale(1.06);
+          z-index: 3;
+          box-shadow: 0 7px 31px #fff5, 0 2px 10px #9997;
+        }
+        .thumbnail-img {
+          will-change: transform;
+        }
+        /* --- Android 15 style: constant particles blur ripple effect --- */
+        .particle-blur-bg {
+          pointer-events: none;
+          position: absolute;
+          left: 0; top: 0; width: 100%; height: 100%;
+          z-index: 0;
+          overflow: hidden;
+        }
+        .particle-blur-bg .particle {
+          position: absolute;
+          border-radius: 50%;
+          opacity: 0.37;
+          filter: blur(14px);
+          background: radial-gradient(circle,rgba(255,255,255,0.13) 0%,rgba(255,255,255,0.06) 70%,rgba(180,180,220,0.04) 100%);
+          animation: particle-float 4.5s linear infinite;
+          pointer-events: none;
+          will-change: transform, opacity;
+        }
+        .particle-blur-bg .particle.p1 { left: 8%; top: 18%; width: 60px; height: 60px; animation-delay: 0s; }
+        .particle-blur-bg .particle.p2 { left: 65%; top: 9%; width: 82px; height: 82px; animation-delay: 1.3s;}
+        .particle-blur-bg .particle.p3 { left: 33%; top: 62%; width: 75px; height: 75px; animation-delay: 2.2s;}
+        .particle-blur-bg .particle.p4 { left: 77%; top: 72%; width: 44px; height: 44px; animation-delay: 3.1s;}
+        .particle-blur-bg .particle.p5 { left: 18%; top: 78%; width: 38px; height: 38px; animation-delay: 1.7s;}
+        .particle-blur-bg .particle.p6 { left: 82%; top: 40%; width: 72px; height: 72px; animation-delay: 2.7s;}
+        .particle-blur-bg .particle.p7 { left: 41%; top: 33%; width: 52px; height: 52px; animation-delay: 0.8s;}
+        .particle-blur-bg .particle.p8 { left: 60%; top: 53%; width: 40px; height: 40px; animation-delay: 2.5s;}
+
+        @keyframes particle-float {
+          0%   { transform: scale(1) translateY(0px); opacity: 0.22; }
+          18%  { opacity: 0.4; }
+          50%  { transform: scale(1.18) translateY(-14px); opacity: 0.46; }
+          80%  { opacity: 0.25; }
+          100% { transform: scale(1) translateY(0px); opacity: 0.22; }
+        }
+        @media (max-width: 767px) {
+          .now-listening-container {
+            max-width: 99vw !important;
+            margin-bottom: 1rem !important;
+            border-radius: 1.15rem !important;
+          }
+          .now-listening-container .thumbnail-wrapper {
+            min-width: 49px !important;
+            min-height: 49px !important;
+          }
+        }
+      `}</style>
     </TiltedCard>
   );
 };

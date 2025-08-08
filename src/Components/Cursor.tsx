@@ -1,25 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
 
 // Helpers
-function isSpecialTile(el: Element | null): boolean {
-  return !!el && !!el.closest(".certificate-tile, .project-tile");
-}
+const SPECIAL_TILE_SELECTOR = ".certificate-tile, .project-tile";
+const CLICKABLE_SELECTOR = [
+  "a",
+  "button",
+  "input",
+  "textarea",
+  "select",
+  "summary",
+  "label",
+  "[role=button]",
+  "[tabindex]:not([tabindex='-1'])",
+  ".cursor-pointer",
+  SPECIAL_TILE_SELECTOR,
+].join(", ");
 
-function isClickable(el: Element | null): boolean {
-  if (!el) return false;
-  const clickableTags = ["A", "BUTTON", "INPUT", "TEXTAREA", "SELECT", "SUMMARY", "LABEL"];
-  let curr: Element | null = el;
-  while (curr) {
-    if (clickableTags.includes(curr.tagName)) return true;
-    if (curr.getAttribute("tabindex") && curr.getAttribute("tabindex") !== "-1") return true;
-    if ((curr as HTMLElement).onclick || (curr as HTMLElement).onmousedown) return true;
-    if (curr.classList.contains("cursor-pointer")) return true;
-    if (curr.classList.contains("certificate-tile") || curr.classList.contains("project-tile")) return true;
-    if (curr.closest("a,button,[role=button],.cursor-pointer")) return true;
-    curr = curr.parentElement;
-  }
-  return false;
-}
+const isSpecialTile = (el: Element | null): boolean => !!el?.closest(SPECIAL_TILE_SELECTOR);
+const isClickable = (el: Element | null): boolean => !!el?.closest(CLICKABLE_SELECTOR);
 
 const Cursor: React.FC = () => {
   const dotRef = useRef<HTMLDivElement>(null);
@@ -159,6 +157,11 @@ const Cursor: React.FC = () => {
   return (
     <>
       <style>{`
+        /* Hide native cursor when custom one is active */
+        body[data-custom-cursor="yes"] {
+          cursor: none;
+        }
+
         .custom-cursor-ring {
           position: fixed;
           pointer-events: none;
@@ -172,6 +175,7 @@ const Cursor: React.FC = () => {
           mix-blend-mode: difference;
           /* Add the glow effect */
           box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3);
+          will-change: transform, opacity;
         }
 
         .custom-cursor-ring.cursor-hover {
@@ -193,6 +197,7 @@ const Cursor: React.FC = () => {
           mix-blend-mode: difference;
           /* Add a subtle glow to the dot */
           box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+          will-change: transform, opacity;
         }
 
         .custom-cursor-view {
@@ -210,6 +215,8 @@ const Cursor: React.FC = () => {
           gap: 0.5rem;
           opacity: 0;
           font-family: 'Space Grotesk', 'Poppins', sans-serif;
+          transition: opacity 0.3s;
+          will-change: transform, opacity;
         }
       `}</style>
       <div ref={ringRef} className="custom-cursor-ring" />
