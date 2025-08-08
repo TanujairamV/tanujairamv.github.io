@@ -53,7 +53,7 @@ const gradientTextClass =
   "bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-300 to-gray-400 invert-on-hover";
 
 const Projects: React.FC = () => (
-  <section id="projects" className="mb-16 fade-in-up" data-fade-delay="6">
+  <div>
     {/* Removed the Projects heading as requested */}
     <div className="grid md:grid-cols-2 gap-8">
       {projects.map((project, idx) => (
@@ -121,7 +121,7 @@ const Projects: React.FC = () => (
         </motion.a>
       ))}
     </div>
-  </section>
+  </div>
 );
 
 export default Projects;

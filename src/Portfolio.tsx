@@ -11,6 +11,7 @@ import Hero from "./Sections/Hero";
 import Education from "./Sections/Education";
 import Experience from "./Sections/Experience";
 import Certificates from "./Sections/Certificates";
+import ShinyText from "./Components/gradient";
 import "./Styles.css";
 
 // Error Boundary for production safety
@@ -38,21 +39,12 @@ function withErrorBoundary(Component: React.ComponentType) {
   };
 }
 
-const gradientText = {
-  background: "linear-gradient(90deg, #fff 70%, #8080ff 100%)",
-  WebkitBackgroundClip: "text",
-  WebkitTextFillColor: "transparent"
-};
-
 const sectionHeading = (text: string, icon?: React.ReactNode) => (
   <div className="flex items-center gap-2 mb-6">
     {icon}
-    <span
-      className="text-2xl font-bold font-hatton"
-      style={{ ...gradientText, fontFamily: "'Hatton', serif" }}
-    >
+    <ShinyText speed={5} className="text-2xl font-bold font-hatton">
       {text}
-    </span>
+    </ShinyText>
   </div>
 );
 
@@ -88,17 +80,13 @@ const Portfolio: React.FC = () => {
         {/* Education */}
         <section id="education" className="mb-20">
           {sectionHeading("Education")}
-          <div className="rounded-xl border border-white/15 bg-white/5 backdrop-blur-md shadow-xl p-6">
-            <Education />
-          </div>
+          <Education />
         </section>
 
         {/* Certificates */}
         <section id="certificates" className="mb-20">
           {sectionHeading("Certificates")}
-          <div className="rounded-xl border border-white/15 bg-white/5 backdrop-blur-md shadow-xl p-6">
-            <Certificates />
-          </div>
+          <Certificates />
         </section>
 
         {/* Projects */}

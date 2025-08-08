@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import ShinyText from "./gradient";
 
 // Scramble animation settings
 const SCRAMBLE_TEXT = "Tanujairam V";
 const SCRAMBLE_DURATION = 1600; // ms
-const INTRO_DURATION = 2300; // ms
+const FADE_OUT_DURATION = 500; // ms for fade-out
+const INTRO_DURATION = 2300; // ms before fade-out starts
 
 // Scramble logic
 function scramble(text: string, progress: number) {
@@ -22,12 +24,13 @@ function scramble(text: string, progress: number) {
 }
 
 const Intro: React.FC<{ onFinish?: () => void }> = ({ onFinish }) => {
-  const [show, setShow] = useState(true);
+  const [isMounted, setIsMounted] = useState(true);
+  const [isFadingOut, setIsFadingOut] = useState(false);
   const [scrambleProgress, setScrambleProgress] = useState(0);
 
   // Hide system and custom cursor when Intro is showing
   useEffect(() => {
-    if (!show) return;
+    if (!isMounted) return;
     // Hide system cursor
     const prevCursor = document.body.style.cursor;
     document.body.style.cursor = "none";
@@ -37,7 +40,7 @@ const Intro: React.FC<{ onFinish?: () => void }> = ({ onFinish }) => {
       document.body.style.cursor = prevCursor;
       document.body.removeAttribute("data-intro-hide-cursor");
     };
-  }, [show]);
+  }, [isMounted]);
 
   useEffect(() => {
     let running = true;
@@ -55,19 +58,26 @@ const Intro: React.FC<{ onFinish?: () => void }> = ({ onFinish }) => {
     }
     scrambleFrame = requestAnimationFrame(animate);
 
-    const timer = setTimeout(() => {
-      setShow(false);
-      if (onFinish) onFinish();
+    // Timer to start fading out
+    const fadeTimer = setTimeout(() => {
+      setIsFadingOut(true);
     }, INTRO_DURATION);
+
+    // Timer to unmount the component after fade-out
+    const unmountTimer = setTimeout(() => {
+      setIsMounted(false);
+      if (onFinish) onFinish();
+    }, INTRO_DURATION + FADE_OUT_DURATION);
 
     return () => {
       running = false;
-      clearTimeout(timer);
+      clearTimeout(fadeTimer);
+      clearTimeout(unmountTimer);
       cancelAnimationFrame(scrambleFrame);
     };
   }, [onFinish]);
 
-  if (!show) return null;
+  if (!isMounted) return null;
 
   return (
     <>
@@ -90,13 +100,19 @@ const Intro: React.FC<{ onFinish?: () => void }> = ({ onFinish }) => {
           line-height: 1.15 !important;
           padding-bottom: 0.18em !important;
         }
+
+        .intro-container.fading-out {
+          opacity: 0;
+          transition: opacity ${FADE_OUT_DURATION}ms ease-out;
+        }
       `}</style>
       <div
-        className="fixed inset-0 z-[9999] flex items-center justify-center bg-black hide-cursor"
+        className={`fixed inset-0 z-[9999] flex items-center justify-center bg-black hide-cursor intro-container ${isFadingOut ? 'fading-out' : ''}`}
         style={{
           minHeight: "100vh",
           minWidth: "100vw",
           overflow: "hidden",
+          transition: `opacity ${FADE_OUT_DURATION}ms ease-out`,
         }}
       >
         <div
@@ -120,28 +136,26 @@ const Intro: React.FC<{ onFinish?: () => void }> = ({ onFinish }) => {
           }}
         >
           <h1
-            className="text-4xl md:text-6xl font-bold text-center intro-title"
+            className="text-4xl md:text-6xl font-bold text-center intro-title font-mono tracking-wider"
             style={{
-              background: "linear-gradient(90deg, #fff 60%, #b0b0b0 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              fontFamily: "'Outfit', 'Plus Jakarta Sans', 'Montserrat', 'Quicksand', sans-serif",
-              letterSpacing: "0.07em",
               userSelect: "none",
               textShadow: "0 4px 40px #000a",
             }}
           >
-            {scramble(SCRAMBLE_TEXT, scrambleProgress)}
+            <ShinyText speed={4} disabled={scrambleProgress < 1}>
+              {scramble(SCRAMBLE_TEXT, scrambleProgress)}
+            </ShinyText>
           </h1>
           <p
-            className="mt-6 max-w-xl text-center text-lg md:text-2xl text-gray-400 font-normal"
+            className="mt-6 max-w-xl text-center text-lg md:text-2xl text-gray-400 font-normal font-caviar"
             style={{
-              fontFamily: "'Outfit', 'Plus Jakarta Sans', 'Montserrat', 'Quicksand', sans-serif",
               textShadow: "0 2px 20px #000a",
             }}
           >
-            I build software and digital experiences.<br />
-            Currently focused on web, cloud, and AI.
+            <ShinyText speed={5} disabled={scrambleProgress < 1}>
+              I build software and digital experiences.<br />
+              Currently focused on web, cloud, and AI.
+            </ShinyText>
           </p>
         </div>
       </div>

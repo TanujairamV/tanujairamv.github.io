@@ -1,29 +1,22 @@
 import React from "react";
 import {
-  FaGithub,
-  FaEnvelope,
-  FaInstagram,
-  FaTelegramPlane
-} from "react-icons/fa";
+  SiGmail,
+  SiGithub,
+  SiInstagram,
+  SiTelegram,
+} from "react-icons/si";
+import ShinyText from "../Components/gradient";
 
 // Removed useFadeInOnScroll import and usage
 
 const aboutText = `As a developer, I’m dedicated to crafting beautiful, high-performance web experiences. I thrive on learning, exploring new technologies, and building projects that make a difference.`;
 
 const socialIcons = [
-  { href: "mailto:tanujairam.v@gmail.com", icon: <FaEnvelope />, label: "Email" },
-  { href: "https://github.com/TanujairamV", icon: <FaGithub />, label: "GitHub" },
-  { href: "https://instagram.com/tanujairam.v", icon: <FaInstagram />, label: "Instagram" },
-  { href: "https://t.me/Tanujairam", icon: <FaTelegramPlane />, label: "Telegram" }
+  { href: "mailto:tanujairam.v@gmail.com", icon: <SiGmail />, label: "Email" },
+  { href: "https://github.com/TanujairamV", icon: <SiGithub />, label: "GitHub" },
+  { href: "https://instagram.com/tanujairam.v", icon: <SiInstagram />, label: "Instagram" },
+  { href: "https://t.me/Tanujairam", icon: <SiTelegram />, label: "Telegram" }
 ];
-
-const gradientText = {
-  background: "linear-gradient(90deg, #fff 80%, #888 100%)",
-  WebkitBackgroundClip: "text" as const,
-  WebkitTextFillColor: "transparent" as const,
-  backgroundClip: "text",
-  color: "transparent"
-};
 
 const Hero: React.FC = () => {
   return (
@@ -55,22 +48,22 @@ const Hero: React.FC = () => {
           <h1
             className="text-3xl md:text-5xl font-hatton font-bold mb-2 flex flex-wrap items-center"
             style={{
-              ...gradientText,
               fontWeight: 700,
               lineHeight: 1.14,
               letterSpacing: "0.01em",
               wordBreak: "break-word"
             }}
           >
-            hey, i'm&nbsp;
-            <span className="font-caviar">Tanujairam</span>
+            <ShinyText speed={4}>
+              hey, i'm&nbsp;
+              <span className="font-caviar">Tanujairam</span>
+            </ShinyText>
           </h1>
         </div>
         {/* Subheading/About */}
         <div
           className="mt-2 mb-5 text-base md:text-lg font-caviar font-medium text-center md:text-left"
           style={{
-            ...gradientText,
             fontWeight: 500,
             lineHeight: 1.5,
             maxWidth: 480,
@@ -79,7 +72,7 @@ const Hero: React.FC = () => {
             wordBreak: "break-word"
           }}
         >
-          {aboutText}
+          <ShinyText speed={5}>{aboutText}</ShinyText>
         </div>
         {/* Social Icons */}
         <div className="flex flex-row mt-2 flex-wrap gap-5">
@@ -90,21 +83,21 @@ const Hero: React.FC = () => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={social.label}
-              style={{
-                fontSize: "2rem",
-                background: "linear-gradient(90deg, #fff 5%, #b0b0b0 94%, #888 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-                color: "#fff",
-                transition: "transform 0.14s, color 0.14s",
-                position: "relative",
-                zIndex: 1,
-                cursor: "none"
-              }}
-              className="hover:scale-110 focus:scale-110 font-unica ripple social-icon"
+              className="hover:scale-110 focus:scale-110 font-unica ripple social-icon animate-shine"
               title={social.label}
               data-cursor="ne-arrow"
+              style={{
+                fontSize: "2rem",
+                backgroundImage: "linear-gradient(90deg, #fff 5%, #b0b0b0 94%, #888 100%)",
+                backgroundSize: "200% auto",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                transition: "transform 0.14s",
+                animationDuration: "6s",
+                position: "relative",
+                zIndex: 1,
+              }}
             >
               <span className="icon-main">{social.icon}</span>
             </a>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-scroll";
 import { MdHome, MdWork, MdSchool, MdStar, MdBuild, MdAssignment } from "react-icons/md";
+import ShinyText from "../Components/gradient";
 
 const NAV_LINKS = [
   { to: "hero", label: "Home", icon: <MdHome size={22} /> },
@@ -126,12 +127,12 @@ const NavBar: React.FC = () => {
         left: "50%",
         top: "1.25rem",
         zIndex: 50,
-        // improved glassmorphism, more semi-transparent
-        background: "rgba(30, 34, 48, 0.58)",
-        backdropFilter: "blur(20px) saturate(1.2)",
-        WebkitBackdropFilter: "blur(20px) saturate(1.2)",
-        border: "1.5px solid rgba(255,255,255,0.11)",
-        boxShadow: "0 4px 24px 0 rgba(25, 25, 37, 0.17), 0 2px 32px 0 rgba(255,255,255,0.08)",
+        // Enhanced glassmorphism for a more premium feel
+        background: "linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))",
+        backdropFilter: "blur(24px) saturate(1.5)",
+        WebkitBackdropFilter: "blur(24px) saturate(1.5)",
+        border: "1px solid rgba(255, 255, 255, 0.18)",
+        boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.25)",
         overflow: "visible"
       }}
       ref={navBarRef}
@@ -145,7 +146,7 @@ const NavBar: React.FC = () => {
       <ul
         className="flex flex-row items-center justify-center w-full"
         style={{
-          gap: mobile ? "0.7rem" : "0.6rem",
+          gap: mobile ? "0.7rem" : "0.8rem",
           margin: 0,
           padding: 0,
           width: "100%"
@@ -154,21 +155,19 @@ const NavBar: React.FC = () => {
         {NAV_LINKS.map((link, i) => (
           <li
             key={link.to}
-            className="px-1.5 md:px-3 py-1 nav-link ripple fade-in"
+            className="nav-link ripple fade-in group"
             data-fade-delay={i + 1}
             style={{
-              fontFamily: "'Space Grotesk', 'Poppins', sans-serif",
-              fontWeight: 600,
-              textTransform: "capitalize",
-              fontSize: mobile ? "1.29rem" : "1.08rem",
-              letterSpacing: ".042em",
-              color: "#fff",
               cursor: "pointer",
               borderRadius: "1.2rem",
-              margin: mobile ? "0.12rem 0" : "0 0.18rem",
               display: "flex",
               alignItems: "center",
               background: "none",
+              // Add padding here for a larger ripple area
+              padding: mobile ? "0.5rem 0.3rem" : "0.5rem 0.7rem",
+              // Use a transparent outline for focus states for better accessibility
+              outline: "2px solid transparent",
+              outlineOffset: "2px",
               transition: "background 0.13s, color 0.13s, transform 0.16s",
               position: "relative",
               overflow: "hidden"
@@ -183,47 +182,30 @@ const NavBar: React.FC = () => {
               offset={-60}
               spy={true}
               activeClass="active"
+              className="flex items-center"
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.55em",
-                background: "linear-gradient(90deg, #fff 70%, #b0b0b0 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                gap: "0.5rem",
                 fontFamily: "'Space Grotesk', 'Poppins', sans-serif",
                 fontWeight: 700,
-                textTransform: "capitalize"
+                textTransform: "capitalize",
+                fontSize: mobile ? "1.3rem" : "1.05rem",
+                letterSpacing: "0.04em",
               }}
-              tabIndex={0}
+              tabIndex={-1} // The parent li is already focusable
               aria-label={link.label}
             >
               <span
                 ref={el => underlineRefs.current[i] = el}
-                style={{
-                  display: "inline-block",
-                  position: "relative",
-                  zIndex: 1,
-                  padding: "0 2px"
-                }}
+                className="relative z-10"
               >
-                {mobile ? link.icon : (
-                  <span
-                    style={{
-                      background: "linear-gradient(90deg, #fff 80%, #b0b0b0 100%)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      fontWeight: 700,
-                      fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
-                    }}
-                  >
-                    {link.label}
-                  </span>
-                )}
+                <ShinyText speed={5} disabled={activeSection !== link.to}>
+                  {mobile ? link.icon : link.label}
+                </ShinyText>
               </span>
               {!mobile && (
-                <span className="nav-arrow" style={{ marginLeft: "0.26em", display: "inline-flex", alignItems: "center" }}>
+                <span className="nav-arrow text-gray-300 opacity-70 group-hover:opacity-100 transition-opacity" style={{ marginLeft: "0.1rem", display: "inline-flex", alignItems: "center" }}>
                   <svg width="17" height="17" viewBox="0 0 17 17">
-                    <polyline points="5,12 12,12 12,5" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M5 12 L12 12 L12 5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </span>
               )}

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaMusic } from "react-icons/fa";
 import { TrackInfo } from "../Data/types";
+import ShinyText from "./gradient";
 import TiltedCard from "./TiltedCard";
 
 interface SpotifyNowPlaying {
@@ -327,50 +328,37 @@ const NowListening: React.FC = () => {
           </div>
           {/* Info block */}
           <div className="flex flex-col min-w-0 flex-1" style={{ marginLeft: mobileView ? 10 : 22, position: "relative" }}>
-            <span
-              className="text-[0.75rem] uppercase tracking-widest mb-1"
+            <ShinyText
+              speed={5}
+              className="text-[0.75rem] uppercase tracking-widest mb-1 opacity-90"
               style={{
-                background: "linear-gradient(90deg, #fff 55%, #b0b0b0 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                fontFamily: "'Space Grotesk', 'Poppins', sans-serif",
                 letterSpacing: "0.15em",
                 fontWeight: 600,
-                opacity: 0.91
               }}
             >
               {headerText}
-            </span>
-            <span
+            </ShinyText>
+            <ShinyText
+              speed={4}
               className="truncate font-bold text-[1.15rem] md:text-[1.24rem] max-w-full relative"
               style={{
-                background: "linear-gradient(90deg, #fff 75%, #b0b0b0 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                fontFamily: "'Space Grotesk', 'Poppins', sans-serif",
                 fontWeight: 700,
                 lineHeight: 1.17,
-                maxWidth: "100%",
                 letterSpacing: "0.01em",
-                overflow: "hidden"
               }}
             >
               {t.name}
-            </span>
-            <span
-              className="truncate text-[1.03rem] md:text-[1.11rem] font-semibold mt-1"
+            </ShinyText>
+            <ShinyText
+              speed={5}
+              className="truncate text-[1.03rem] md:text-[1.11rem] mt-1 max-w-full"
               style={{
-                background: "linear-gradient(90deg, #fff 45%, #b0b0b0 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                fontFamily: "'Space Grotesk', 'Poppins', sans-serif",
                 lineHeight: 1.13,
-                maxWidth: "100%",
                 fontWeight: 500
               }}
             >
               {t.artist}
-            </span>
+            </ShinyText>
             {showVisualizer && <BoxWideVisualizer mobile={mobileView} />}
             {showVisualizer && track?.durationMs && (
               <div

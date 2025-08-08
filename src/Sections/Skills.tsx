@@ -53,17 +53,8 @@ const Skillchip: React.FC = () => {
   const scrollingSkills = [...skills, ...skills];
 
   return (
-    <section className="w-full py-8 md:py-14">
-      <h2
-        className="text-2xl md:text-3xl font-bold mb-6 text-center"
-        style={{
-          background: "linear-gradient(90deg, #fff, #b0b0b0 100%)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-        }}
-      >
-        My Skills
-      </h2>
+    // Changed from section to div to avoid nested sections and removed redundant title
+    <div className="w-full pt-2 pb-4">
       <div className="overflow-x-auto scrollbar-hide w-full">
         <div
           className="flex flex-nowrap gap-3 px-2 py-3"
@@ -101,7 +92,7 @@ const Skillchip: React.FC = () => {
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
-    </section>
+    </div>
   );
 };
 

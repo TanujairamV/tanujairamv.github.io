@@ -1,6 +1,8 @@
 import React from "react";
 import { FaGithub, FaBolt } from "react-icons/fa";
 import { SiWhatsapp, SiHtml5 } from "react-icons/si";
+import AnimatedList from "../Components/AnimatedList";
+import ShinyText from "../Components/gradient";
 
 const EXPERIENCES = [
   {
@@ -50,43 +52,54 @@ const EXPERIENCES = [
   }
 ];
 
-const Experience: React.FC = () => (
-  <section id="experience" className="w-full">
-    <div className="flex flex-col gap-10">
-      {EXPERIENCES.map((exp, idx) => (
-        <div
-          key={exp.title}
-          className={`relative group transition-all duration-400 rounded-2xl bg-white/10 border border-white/20 shadow-xl backdrop-blur-md px-7 py-6 flex flex-col md:flex-row md:items-center gap-5 md:gap-8
-            ${idx === 0 ? "ring-1 ring-blue-300/30" : ""}
-          `}
-        >
-          <div className="flex-shrink-0 flex flex-col items-center justify-start pt-1">
-            <div className="rounded-full bg-black/60 border border-white/15 p-3 mb-2">
-              {exp.icon}
-            </div>
-            <span className="text-xs text-blue-200 font-caviar font-bold">{exp.period}</span>
-          </div>
-          <div className="flex-1">
-            <h3 className="font-bold text-xl font-caviar mb-1 text-blue-100" style={{letterSpacing: "0.01em"}}>
-              {exp.title}
-            </h3>
-            <ul className="list-disc ml-5 mb-2 text-gray-200 font-caviar space-y-1 text-base">
-              {exp.description.map((d, i) => (
-                <li key={i}>{d}</li>
-              ))}
-            </ul>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {exp.tags.map((tag) => (
-                <span key={tag}
-                  className="bg-blue-900/60 text-blue-200 font-semibold text-xs px-2 py-1 rounded-lg uppercase tracking-wide border border-blue-400/10"
-                >{tag}</span>
-              ))}
-            </div>
-          </div>
-        </div>
-      ))}
+const renderExperienceItem = (item: typeof EXPERIENCES[0], isSelected: boolean) => (
+  <div
+    className={`
+      relative group transition-all duration-300 rounded-2xl shadow-xl backdrop-blur-md px-7 py-6 
+      flex flex-col md:flex-row md:items-start gap-5 md:gap-8 border-2
+      ${isSelected ? 'scale-[1.02] bg-white/20 border-blue-300/70' : 'bg-white/10 border-white/20'}
+    `}
+    style={{
+      backdropFilter: "blur(16px) saturate(1.2)",
+      WebkitBackdropFilter: "blur(16px) saturate(1.2)",
+    }}
+  >
+    <div className="flex-shrink-0 flex flex-col items-center justify-start pt-1">
+      <div className="rounded-full bg-black/60 border border-white/15 p-3 mb-2">
+        {item.icon}
+      </div>
+      <span className="text-xs text-blue-200 font-caviar font-bold">{item.period}</span>
     </div>
-  </section>
+    <div className="flex-1">
+      <h3 className="mb-2">
+        <ShinyText disabled={!isSelected} speed={5} className="font-bold text-xl font-caviar" style={{ letterSpacing: "0.01em" }}>
+          {item.title}
+        </ShinyText>
+      </h3>
+      <ul className="list-disc ml-5 mb-3 text-gray-200 font-caviar space-y-1 text-base">
+        {item.description.map((d, i) => (
+          <li key={i}>{d}</li>
+        ))}
+      </ul>
+      <div className="flex flex-wrap gap-2 mt-2">
+        {item.tags.map((tag) => (
+          <span key={tag}
+            className="bg-blue-900/60 text-blue-200 font-semibold text-xs px-2 py-1 rounded-lg uppercase tracking-wide border border-blue-400/10"
+          >{tag}</span>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+const Experience: React.FC = () => (
+  <div className="w-full">
+    <AnimatedList
+      items={EXPERIENCES}
+      renderItem={renderExperienceItem}
+      getKey={(item) => item.title}
+    />
+  </div>
 );
 
 export default Experience;
