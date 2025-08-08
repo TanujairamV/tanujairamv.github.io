@@ -213,110 +213,110 @@ const NavBar: React.FC = () => {
         }
       }
     `}</style>
-    <nav
-      id="navbar"
-      className="glass-navbar fixed top-5 left-1/2 z-50 transition-all duration-300"
-      style={{
-        transform: "translateX(-50%)",
-        padding: mobile ? "0.18rem 0.5rem" : "0.55rem 2.2rem",
-        borderRadius: "2.2rem",
-        minWidth: mobile ? "auto" : "400px",
-        minHeight: mobile ? "46px" : "56px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontFamily: "'Space Grotesk', 'Poppins', sans-serif",
-        position: "fixed",
-        left: "50%",
-        top: "1.25rem",
-        zIndex: 50,
-        // Enhanced glassmorphism for a more premium feel
-        background: "linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))",
-        backdropFilter: "blur(24px) saturate(1.5)",
-        WebkitBackdropFilter: "blur(24px) saturate(1.5)",
-        border: "1px solid rgba(255, 255, 255, 0.18)",
-        boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.25)",
-        overflow: "visible"
-      }}
-      ref={navBarRef}
-    >
-      {navReady && (
-        <span
-          className="navbar-underline"
-          style={underlineStyle}
-        />
-      )}
-      <ul
-        className="flex flex-row items-center justify-center w-full"
+      <nav
+        id="navbar"
+        className="glass-navbar fixed top-5 left-1/2 z-50 transition-all duration-300"
         style={{
-          gap: mobile ? "0.7rem" : "0.8rem",
-          margin: 0,
-          padding: 0,
-          width: "100%"
+          transform: "translateX(-50%)",
+          padding: mobile ? "0.18rem 0.5rem" : "0.55rem 2.2rem",
+          borderRadius: "2.2rem",
+          minWidth: mobile ? "auto" : "400px",
+          minHeight: mobile ? "46px" : "56px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "'Space Grotesk', 'Poppins', sans-serif",
+          position: "fixed",
+          left: "50%",
+          top: "1.25rem",
+          zIndex: 50,
+          // Enhanced glassmorphism for a more premium feel
+          background: "linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))",
+          backdropFilter: "blur(24px) saturate(1.5)",
+          WebkitBackdropFilter: "blur(24px) saturate(1.5)",
+          border: "1px solid rgba(255, 255, 255, 0.18)",
+          boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.25)",
+          overflow: "visible"
         }}
+        ref={navBarRef}
       >
-        {NAV_LINKS.map((link, i) => (
-          <li
-            key={link.to}
-            className="nav-link ripple fade-in group"
-            data-fade-delay={i + 1}
-            style={{
-              cursor: "pointer",
-              borderRadius: "1.2rem",
-              display: "flex",
-              alignItems: "center",
-              background: "none",
-              // Add padding here for a larger ripple area
-              padding: mobile ? "0.5rem 0.3rem" : "0.5rem 0.7rem",
-              // Use a transparent outline for focus states for better accessibility
-              outline: "2px solid transparent",
-              outlineOffset: "2px",
-              transition: "background 0.13s, color 0.13s, transform 0.16s",
-              position: "relative",
-              overflow: "hidden"
-            }}
-            onClick={handleRipple}
-            tabIndex={0}
-          >
-            <Link
-              to={link.to}
-              smooth={true}
-              duration={600}
-              offset={-60}
-              spy={true}
-              activeClass="active"
-              className="flex items-center"
+        {navReady && (
+          <span
+            className="navbar-underline"
+            style={underlineStyle}
+          />
+        )}
+        <ul
+          className="flex flex-row items-center justify-center w-full"
+          style={{
+            gap: mobile ? "0.7rem" : "0.8rem",
+            margin: 0,
+            padding: 0,
+            width: "100%"
+          }}
+        >
+          {NAV_LINKS.map((link, i) => (
+            <li
+              key={link.to}
+              className="nav-link ripple fade-in group"
+              data-fade-delay={i + 1}
               style={{
-                gap: "0.5rem",
-                fontFamily: "'Space Grotesk', 'Poppins', sans-serif",
-                fontWeight: 700,
-                textTransform: "capitalize",
-                fontSize: mobile ? "1.3rem" : "1.05rem",
-                letterSpacing: "0.04em",
+                cursor: "pointer",
+                borderRadius: "1.2rem",
+                display: "flex",
+                alignItems: "center",
+                background: "none",
+                // Add padding here for a larger ripple area
+                padding: mobile ? "0.5rem 0.3rem" : "0.5rem 0.7rem",
+                // Use a transparent outline for focus states for better accessibility
+                outline: "2px solid transparent",
+                outlineOffset: "2px",
+                transition: "background 0.13s, color 0.13s, transform 0.16s",
+                position: "relative",
+                overflow: "hidden"
               }}
-              tabIndex={-1} // The parent li is already focusable
-              aria-label={link.label}
+              onClick={handleRipple}
+              tabIndex={0}
             >
-              <span
-                ref={el => underlineRefs.current[i] = el}
-                className="relative z-10"
+              <Link
+                to={link.to}
+                smooth={true}
+                duration={600}
+                offset={-60}
+                spy={true}
+                activeClass="active"
+                className="flex items-center"
+                style={{
+                  gap: "0.5rem",
+                  fontFamily: "'Space Grotesk', 'Poppins', sans-serif",
+                  fontWeight: 700,
+                  textTransform: "capitalize",
+                  fontSize: mobile ? "1.3rem" : "1.05rem",
+                  letterSpacing: "0.04em",
+                }}
+                tabIndex={-1} // The parent li is already focusable
+                aria-label={link.label}
               >
-                <ShinyText speed={5} disabled={activeSection !== link.to}>
-                  {mobile ? link.icon : link.label}
-                </ShinyText>
-              </span>
-              {!mobile && (
-                <span className="nav-arrow text-gray-300 opacity-70 group-hover:opacity-100 transition-opacity" style={{ marginLeft: "0.1rem", display: "inline-flex", alignItems: "center" }}>
-                  <svg width="17" height="17" viewBox="0 0 17 17">
-                    <path d="M5 12 L12 12 L12 5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
+                <span
+                  ref={el => underlineRefs.current[i] = el}
+                  className="relative z-10"
+                >
+                  <ShinyText speed={5} disabled={activeSection !== link.to}>
+                    {mobile ? link.icon : link.label}
+                  </ShinyText>
                 </span>
-              )}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
+                {!mobile && (
+                  <span className="nav-arrow text-gray-300 opacity-70 group-hover:opacity-100 transition-opacity" style={{ marginLeft: "0.1rem", display: "inline-flex", alignItems: "center" }}>
+                    <svg width="17" height="17" viewBox="0 0 17 17">
+                      <path d="M5 12 L12 12 L12 5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                )}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </>
   );
 };
