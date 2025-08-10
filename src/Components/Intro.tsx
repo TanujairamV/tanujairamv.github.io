@@ -30,17 +30,12 @@ const Intro: React.FC<{ onFinish?: () => void }> = ({ onFinish }) => {
 
   // Hide system and custom cursor when Intro is showing
   useEffect(() => {
-    if (!isMounted) return;
-    // Hide system cursor
-    const prevCursor = document.body.style.cursor;
-    document.body.style.cursor = "none";
     // Hide custom cursor (using data attribute for CSS)
     document.body.setAttribute("data-intro-hide-cursor", "yes");
     return () => {
-      document.body.style.cursor = prevCursor;
       document.body.removeAttribute("data-intro-hide-cursor");
     };
-  }, [isMounted]);
+  }, []);
 
   useEffect(() => {
     let running = true;
