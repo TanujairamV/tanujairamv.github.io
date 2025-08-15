@@ -104,15 +104,25 @@ const Cursor: React.FC = () => {
     useEffect(() => {
         if (isTouchDevice) return;
 
-        const handleMouseLeave = () => setIsCursorVisible(false);
-        const handleMouseEnter = () => setIsCursorVisible(true);
+        const handleMouseLeave = () => {
+            setIsCursorVisible(false);
+        };
+        const handleMouseEnter = (e: MouseEvent) => {
+            setIsCursorVisible(true);
+            // On re-entry, we must immediately update the dot's position and visibility
+            // as a `mousemove` event may not have fired yet.
+            if (dotRef.current) {
+                dotRef.current.style.transform = `translate3d(${e.clientX - 4}px, ${e.clientY - 4}px, 0)`;
+                dotRef.current.style.opacity = "1";
+            }
+        };
 
         document.documentElement.addEventListener("mouseleave", handleMouseLeave);
-        document.documentElement.addEventListener("mouseenter", handleMouseEnter);
+        document.documentElement.addEventListener("mouseenter", handleMouseEnter as EventListener);
 
         return () => {
             document.documentElement.removeEventListener("mouseleave", handleMouseLeave);
-            document.documentElement.removeEventListener("mouseenter", handleMouseEnter);
+            document.documentElement.removeEventListener("mouseenter", handleMouseEnter as EventListener);
         };
     }, [isTouchDevice]);
 

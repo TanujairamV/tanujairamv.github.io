@@ -88,15 +88,23 @@ const NavBar: React.FC = () => {
   }, [activeSection, mobile, navReady]);
 
   // Ripple Handler for NavBar links
-  const handleRipple = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
+  const handleRipple = (e: React.MouseEvent<HTMLLIElement>) => {
     const target = e.currentTarget;
     const circle = document.createElement("span");
     const diameter = Math.max(target.clientWidth, target.clientHeight);
     const radius = diameter / 2;
     circle.classList.add("ripple-span");
     circle.style.width = circle.style.height = `${diameter}px`;
-    circle.style.left = `${e.clientX - target.getBoundingClientRect().left - radius}px`;
-    circle.style.top = `${e.clientY - target.getBoundingClientRect().top - radius}px`;
+
+    // A programmatic click (e.g., from onKeyDown) will have e.detail === 0.
+    // A real user click will have e.detail >= 1, so we use mouse coordinates.
+    if (e.detail === 0) {
+      circle.style.left = `${target.clientWidth / 2 - radius}px`;
+      circle.style.top = `${target.clientHeight / 2 - radius}px`;
+    } else {
+      circle.style.left = `${e.clientX - target.getBoundingClientRect().left - radius}px`;
+      circle.style.top = `${e.clientY - target.getBoundingClientRect().top - radius}px`;
+    }
 
     // Remove existing ripples
     const ripple = target.getElementsByClassName("ripple-span")[0];
@@ -109,24 +117,33 @@ const NavBar: React.FC = () => {
     }, 500);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLLIElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        // Programmatically click the link, which will trigger the onClick for the ripple
+        e.currentTarget.querySelector('a')?.click();
+    }
+  };
+
   return (
     <>
     <style>{`
       /* Glassmorphic Navbar */
       .glass-navbar {
-        background: linear-gradient(120deg, rgba(30,32,40,0.86) 70%, rgba(255,255,255,0.12) 100%);
-        border: 1.8px solid rgba(255,255,255,0.22);
-        box-shadow: 0 6px 24px 0 rgba(25, 25, 37, 0.18), 0 2px 32px 0 rgba(255,255,255,0.09);
-        backdrop-filter: blur(22px) saturate(1.4);
-        -webkit-backdrop-filter: blur(22px) saturate(1.4);
+        /* Enhanced glassmorphism for a more premium feel */
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+        backdrop-filter: blur(24px) saturate(1.5);
+        -webkit-backdrop-filter: blur(24px) saturate(1.5);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
       }
 
       /* Improved NavBar Hover */
       .nav-link {
         position: relative;
+        overflow: hidden; /* For ripple */
         display: inline-flex;
         align-items: center;
-        padding: 0.5em 1.2em;
         border-radius: 1.3em;
         transition: 
           background 0.19s cubic-bezier(.61,.13,.45,.87),
@@ -137,9 +154,6 @@ const NavBar: React.FC = () => {
         color: #fff;
         cursor: none;
       }
-      .nav-link:focus {
-        outline: none;
-      }
       .nav-link .nav-arrow {
         opacity: 0;
         transform: translateX(-4px) scale(0.85);
@@ -148,16 +162,20 @@ const NavBar: React.FC = () => {
         display: inline-flex;
         align-items: center;
       }
-      .nav-link:hover,
-      .nav-link:focus {
+      .nav-link:hover {
+        transform: scale(1.10);
+      }
+      .nav-link:hover, .nav-link:focus-visible {
         background: linear-gradient(90deg,rgba(255,255,255,0.09) 65%,rgba(255,255,255,0.28) 100%);
         box-shadow: 0 2px 16px 0 #fff1, 0 0 0 2px #fff2;
         color: #fff !important;
-        transform: scale(1.10);
         border-radius: 2em;
       }
+      .nav-link:focus {
+        outline: none;
+      }
       .nav-link:hover .nav-arrow,
-      .nav-link:focus .nav-arrow {
+      .nav-link:focus-visible .nav-arrow {
         opacity: 1;
         transform: translateX(0) scale(1.09);
       }
@@ -191,6 +209,22 @@ const NavBar: React.FC = () => {
         z-index: 2;
         box-shadow: 0 2px 12px #fff2;
       }
+      
+      /* Ripple Effect */
+      .ripple-span {
+        position: absolute;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.4);
+        transform: scale(0);
+        animation: ripple-anim 0.5s ease-out;
+        pointer-events: none;
+      }
+      @keyframes ripple-anim {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
 
       @media (max-width: 767px) {
         #navbar {
@@ -215,30 +249,17 @@ const NavBar: React.FC = () => {
     `}</style>
       <nav
         id="navbar"
-        className="glass-navbar fixed top-5 left-1/2 z-50 transition-all duration-300"
+        ref={navBarRef}
+        className="glass-navbar fixed top-5 left-1/2 z-50 flex items-center justify-center transition-all duration-300"
         style={{
           transform: "translateX(-50%)",
           padding: mobile ? "0.18rem 0.5rem" : "0.55rem 2.2rem",
           borderRadius: "2.2rem",
           minWidth: mobile ? "auto" : "400px",
           minHeight: mobile ? "46px" : "56px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
           fontFamily: "'Space Grotesk', 'Poppins', sans-serif",
-          position: "fixed",
-          left: "50%",
-          top: "1.25rem",
-          zIndex: 50,
-          // Enhanced glassmorphism for a more premium feel
-          background: "linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))",
-          backdropFilter: "blur(24px) saturate(1.5)",
-          WebkitBackdropFilter: "blur(24px) saturate(1.5)",
-          border: "1px solid rgba(255, 255, 255, 0.18)",
-          boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.25)",
           overflow: "visible"
         }}
-        ref={navBarRef}
       >
         {navReady && (
           <span
@@ -261,22 +282,11 @@ const NavBar: React.FC = () => {
               className="nav-link ripple fade-in group"
               data-fade-delay={i + 1}
               style={{
-                cursor: "pointer",
-                borderRadius: "1.2rem",
-                display: "flex",
-                alignItems: "center",
-                background: "none",
-                // Add padding here for a larger ripple area
                 padding: mobile ? "0.5rem 0.3rem" : "0.5rem 0.7rem",
-                // Use a transparent outline for focus states for better accessibility
-                outline: "2px solid transparent",
-                outlineOffset: "2px",
-                transition: "background 0.13s, color 0.13s, transform 0.16s",
-                position: "relative",
-                overflow: "hidden"
               }}
               onClick={handleRipple}
               tabIndex={0}
+              onKeyDown={handleKeyDown}
             >
               <Link
                 to={link.to}
