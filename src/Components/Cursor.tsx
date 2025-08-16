@@ -1,162 +1,140 @@
+/* eslint-disable react/no-unknown-property */
 import React, { useEffect, useRef, useState } from "react";
 
 // Helpers
-const SPECIAL_TILE_SELECTOR = ".certificate-tile, .project-tile";
 const CLICKABLE_SELECTOR = [
-  "a",
-  "button",
-  "input",
-  "textarea",
-  "select",
-  "summary",
-  "label",
-  "[role=button]",
-  "[tabindex]:not([tabindex='-1'])",
-  ".cursor-pointer",
-  SPECIAL_TILE_SELECTOR,
+    "a",
+    "button",
+    "input",
+    "textarea",
+    "select",
+    "summary",
+    "label",
+    "[role=button]",
+    "[tabindex]:not([tabindex='-1'])",
+    ".cursor-pointer",
 ].join(", ");
 
-const isSpecialTile = (el: Element | null): boolean => !!el?.closest(SPECIAL_TILE_SELECTOR);
 const isClickable = (el: Element | null): boolean => !!el?.closest(CLICKABLE_SELECTOR);
 
 const Cursor: React.FC = () => {
-  const dotRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
-  const viewRef = useRef<HTMLDivElement>(null);
+    const dotRef = useRef<HTMLDivElement>(null);
+    const ringRef = useRef<HTMLDivElement>(null);
 
-  const [shouldShow, setShouldShow] = useState(false);
-  const [showView, setShowView] = useState(false);
-  const [isCursorVisible, setIsCursorVisible] = useState(true);
+    const [isTouchDevice, setIsTouchDevice] = useState(false);
+    const [isCursorVisible, setIsCursorVisible] = useState(true);
 
-  const mouse = useRef({ x: 0, y: 0 });
-  const ring = useRef({ x: 0, y: 0, scale: 1 });
-  const animationFrame = useRef<number>();
+    const mouse = useRef({ x: 0, y: 0 });
+    const ring = useRef({ x: 0, y: 0, scale: 1 });
+    const animationFrame = useRef<number>();
 
-  useEffect(() => {
-    const isTouch =
-      typeof window !== "undefined" &&
-      ("ontouchstart" in window ||
-        navigator.maxTouchPoints > 0 ||
-        // @ts-ignore
-        navigator.msMaxTouchPoints > 0);
+    useEffect(() => {
+        const touch =
+            typeof window !== "undefined" &&
+            ("ontouchstart" in window ||
+                navigator.maxTouchPoints > 0 ||
+                // @ts-ignore
+                (navigator.msMaxTouchPoints > 0));
+        setIsTouchDevice(touch);
+    }, []);
 
-    setShouldShow(!isTouch);
+    useEffect(() => {
+        if (isTouchDevice) {
+            document.body.removeAttribute("data-custom-cursor");
+            return;
+        };
 
-    const handleTouch = () => setShouldShow(false);
-    const handleMouse = () => setShouldShow(true);
-
-    window.addEventListener("touchstart", handleTouch, { passive: true });
-    window.addEventListener("mousemove", handleMouse);
-
-    return () => {
-      window.removeEventListener("touchstart", handleTouch);
-      window.removeEventListener("mousemove", handleMouse);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!shouldShow) return;
-
-    const lerp = (a: number, b: number, n: number) => a + (b - a) * n;
-
-    const animate = () => {
-      const isHovering = ringRef.current?.classList.contains("cursor-hover");
-      const targetScale = isHovering ? 1.4 : 1;
-
-      ring.current.x = lerp(ring.current.x, mouse.current.x, 0.2);
-      ring.current.y = lerp(ring.current.y, mouse.current.y, 0.2);
-      ring.current.scale = lerp(ring.current.scale, targetScale, 0.2);
-
-      if (ringRef.current) {
-        // Center the 50px ring on the cursor and apply scale
-        const transform = `translate3d(${ring.current.x - 25}px, ${ring.current.y - 25}px, 0) scale(${ring.current.scale})`;
-        ringRef.current.style.transform = transform;
-        ringRef.current.style.opacity = showView || !isCursorVisible ? "0" : "1";
-      }
-
-      if (viewRef.current) {
-        viewRef.current.style.transform = `translate3d(${ring.current.x - 48}px, ${ring.current.y - 24}px, 0)`;
-        viewRef.current.style.opacity = showView && isCursorVisible ? "1" : "0";
-      }
-
-      animationFrame.current = requestAnimationFrame(animate);
-    };
-
-    animationFrame.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationFrame.current) cancelAnimationFrame(animationFrame.current);
-    };
-  }, [shouldShow, showView, isCursorVisible]);
-
-  useEffect(() => {
-    if (!shouldShow) return;
-
-    const handleMove = (e: MouseEvent) => {
-      mouse.current.x = e.clientX;
-      mouse.current.y = e.clientY;
-
-      if (dotRef.current) {
-        dotRef.current.style.transform = `translate3d(${e.clientX - 4}px, ${e.clientY - 4}px, 0)`;
-        dotRef.current.style.opacity = isCursorVisible ? "1" : "0";
-      }
-
-      const el = document.elementFromPoint(e.clientX, e.clientY);
-      setShowView(isSpecialTile(el));
-
-      if (ringRef.current) {
-        if (isClickable(el)) {
-          ringRef.current.classList.add("cursor-hover");
-        } else {
-          ringRef.current.classList.remove("cursor-hover");
-        }
-      }
-    };
-
-    window.addEventListener("mousemove", handleMove);
-    return () => window.removeEventListener("mousemove", handleMove);
-  }, [shouldShow, isCursorVisible]);
-
-  useEffect(() => {
-    if (typeof document !== "undefined") {
-      if (shouldShow) {
         document.body.setAttribute("data-custom-cursor", "yes");
-      } else {
-        document.body.removeAttribute("data-custom-cursor");
-      }
-    }
 
-    return () => {
-      if (typeof document !== "undefined") {
-        document.body.removeAttribute("data-custom-cursor");
-      }
-    };
-  }, [shouldShow]);
+        const lerp = (a: number, b: number, n: number) => a + (b - a) * n;
 
-  useEffect(() => {
-    if (!shouldShow) return;
+        const animate = () => {
+            const isHovering = ringRef.current?.classList.contains("cursor-hover");
+            const targetScale = isHovering ? 1.4 : 1;
 
-    const handleMouseLeave = () => setIsCursorVisible(false);
-    const handleMouseEnter = () => setIsCursorVisible(true);
+            ring.current.x = lerp(ring.current.x, mouse.current.x, 0.2);
+            ring.current.y = lerp(ring.current.y, mouse.current.y, 0.2);
+            ring.current.scale = lerp(ring.current.scale, targetScale, 0.2);
 
-    window.addEventListener("mouseleave", handleMouseLeave);
-    window.addEventListener("mouseenter", handleMouseEnter);
+            if (ringRef.current) {
+                // Center the 50px ring on the cursor and apply scale
+                const transform = `translate3d(${ring.current.x - 25}px, ${ring.current.y - 25}px, 0) scale(${ring.current.scale})`;
+                ringRef.current.style.transform = transform;
+                ringRef.current.style.opacity = !isCursorVisible ? "0" : "1";
+            }
 
-    return () => {
-      window.removeEventListener("mouseleave", handleMouseLeave);
-      window.removeEventListener("mouseenter", handleMouseEnter);
-    };
-  }, [shouldShow]);
+            animationFrame.current = requestAnimationFrame(animate);
+        };
 
-  const introHide =
-    typeof document !== "undefined" &&
-    document.body.hasAttribute("data-intro-hide-cursor");
+        animationFrame.current = requestAnimationFrame(animate);
 
-  if (!shouldShow || introHide) return null;
+        return () => {
+            if (animationFrame.current) cancelAnimationFrame(animationFrame.current);
+            document.body.removeAttribute("data-custom-cursor");
+        };
+    }, [isTouchDevice, isCursorVisible]);
 
-  return (
-    <>
-      <style>{`
+    useEffect(() => {
+        if (isTouchDevice) return;
+
+        const handleMove = (e: MouseEvent) => {
+            mouse.current.x = e.clientX;
+            mouse.current.y = e.clientY;
+
+            if (dotRef.current) {
+                dotRef.current.style.transform = `translate3d(${e.clientX - 4}px, ${e.clientY - 4}px, 0)`;
+                dotRef.current.style.opacity = isCursorVisible ? "1" : "0";
+            }
+
+            const el = document.elementFromPoint(e.clientX, e.clientY);
+
+            if (ringRef.current) {
+                if (isClickable(el)) {
+                    ringRef.current.classList.add("cursor-hover");
+                } else {
+                    ringRef.current.classList.remove("cursor-hover");
+                }
+            }
+        };
+
+        window.addEventListener("mousemove", handleMove);
+        return () => window.removeEventListener("mousemove", handleMove);
+    }, [isTouchDevice, isCursorVisible]);
+
+    useEffect(() => {
+        if (isTouchDevice) return;
+
+        const handleMouseLeave = () => {
+            setIsCursorVisible(false);
+        };
+        const handleMouseEnter = (e: MouseEvent) => {
+            setIsCursorVisible(true);
+            // On re-entry, we must immediately update the dot's position and visibility
+            // as a `mousemove` event may not have fired yet.
+            if (dotRef.current) {
+                dotRef.current.style.transform = `translate3d(${e.clientX - 4}px, ${e.clientY - 4}px, 0)`;
+                dotRef.current.style.opacity = "1";
+            }
+        };
+
+        document.documentElement.addEventListener("mouseleave", handleMouseLeave);
+        document.documentElement.addEventListener("mouseenter", handleMouseEnter as EventListener);
+
+        return () => {
+            document.documentElement.removeEventListener("mouseleave", handleMouseLeave);
+            document.documentElement.removeEventListener("mouseenter", handleMouseEnter as EventListener);
+        };
+    }, [isTouchDevice]);
+
+    const introHide =
+        typeof document !== "undefined" &&
+        document.body.hasAttribute("data-intro-hide-cursor");
+
+    if (isTouchDevice || introHide) return null;
+
+    return (
+        <>
+            <style>{`
         /* Hide native cursor when custom one is active */
         body[data-custom-cursor="yes"] {
           cursor: none;
@@ -199,34 +177,11 @@ const Cursor: React.FC = () => {
           box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
           will-change: transform, opacity;
         }
-
-        .custom-cursor-view {
-          position: fixed;
-          pointer-events: none;
-          z-index: 10000;
-          background-color: #fff;
-          color: #111;
-          font-size: 1rem;
-          font-weight: 600;
-          padding: 0.5rem 1rem;
-          border-radius: 1.5rem;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          opacity: 0;
-          font-family: 'Space Grotesk', 'Poppins', sans-serif;
-          transition: opacity 0.3s;
-          will-change: transform, opacity;
-        }
       `}</style>
-      <div ref={ringRef} className="custom-cursor-ring" />
-      <div ref={dotRef} className="custom-cursor-dot" />
-      <div ref={viewRef} className="custom-cursor-view">
-        <span>View</span>
-        <span>→</span>
-      </div>
-    </>
-  );
+            <div ref={ringRef} className="custom-cursor-ring" />
+            <div ref={dotRef} className="custom-cursor-dot" />
+        </>
+    );
 };
 
 export default Cursor;
