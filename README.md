@@ -1,4 +1,4 @@
-# Tanujairam's Portfolio
+# Rohan's Portfolio
 
 Simple portfolio made with React, TailwindCSS, and Framer Motion.  
 Deployed via Vercel 🚀
