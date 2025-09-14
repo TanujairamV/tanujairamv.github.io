@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { FaMusic } from "react-icons/fa";
+import React, { useEffect, useState, useMemo, useRef } from "react";
+import { FaSpotify } from "react-icons/fa";
 import { TrackInfo } from "../Data/types";
 import ShinyText from "./gradient";
 import TiltedCard from "./TiltedCard";
@@ -25,62 +25,141 @@ const fallbackTrack: TrackInfo = {
   url: "#",
 };
 
-const BoxWideVisualizer: React.FC<{ mobile?: boolean }> = ({ mobile }) => {
-  const barCount = mobile ? 8 : 16;
-  const [heights, setHeights] = useState(Array(barCount).fill(8));
+const SwigglyProgressBar: React.FC<{ progress: number; mobile?: boolean; isPlaying: boolean }> = ({ progress, mobile, isPlaying }) => {
+  const pathRef = useRef<SVGPathElement>(null);
+  const [pinPosition, setPinPosition] = useState({ x: 0, y: 0 });
+  const [wavePath, setWavePath] = useState('');
+  const width = mobile ? 180 : 240;
+  const height = mobile ? 14 : 18;
+  const animationFrameRef = useRef<number>();
+
   useEffect(() => {
-    let raf: number;
-    let anim = true;
-    const animate = () => {
-      setHeights(
-        Array(barCount)
-          .fill(0)
-          .map((_, i) =>
-            10 +
-            Math.abs(
-              Math.sin(Date.now() / (330 + i * 13)) +
-              Math.cos(Date.now() / (210 + i * 41))
-            ) * (mobile ? 14 : 20)
-          )
-      );
-      if (anim) raf = requestAnimationFrame(animate);
+    const yOffset = height / 2;
+
+    // "Uniform" wave parameters
+    const amplitude = mobile ? 3 : 4;
+    const frequency = 5;
+    const speed = 1.5;
+
+    const getWavePath = (time: number) => {
+      let path = `M 0 ${yOffset}`;
+      for (let x = 0; x <= width; x++) {
+        const angle = (x / width) * (frequency * Math.PI * 2) + time * speed;
+        const y = yOffset + amplitude * Math.sin(angle);
+        path += ` L ${x} ${y}`;
+      }
+      return path;
     };
-    animate();
+
+    const updatePinPosition = (time: number) => {
+      const pinX = width * (progress / 100);
+      const angle = (pinX / width) * (frequency * Math.PI * 2) + time * speed;
+      const y = yOffset + amplitude * Math.sin(angle);
+      const pinY = y;
+      setPinPosition({ x: pinX, y: pinY });
+    };
+
+    if (!isPlaying) {
+      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+      setWavePath(getWavePath(0));
+      updatePinPosition(0);
+      return;
+    }
+
+    const animate = (timestamp: number) => {
+      const time = timestamp / 1000;
+      setWavePath(getWavePath(time));
+      updatePinPosition(time);
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animationFrameRef.current = requestAnimationFrame(animate);
+
     return () => {
-      anim = false;
-      cancelAnimationFrame(raf);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
-    // eslint-disable-next-line
-  }, [barCount, mobile]);
+  }, [progress, isPlaying, width, height, mobile]);
+
+  const clipId = useMemo(() => `progress-clip-${Math.random().toString(16).slice(2)}`, []);
+
   return (
-    <div
-      className="box-wide-visualizer"
-      style={{
-        display: "flex",
-        alignItems: "flex-end",
-        width: "100%",
-        height: mobile ? 18 : 28,
-        marginTop: mobile ? 9 : 13,
-        gap: mobile ? 3 : 5,
-        justifyContent: "center",
-        pointerEvents: "none"
-      }}
-      aria-hidden="true"
-    >
-      {heights.map((h, i) => (
-        <div
-          key={i}
-          style={{
-            width: mobile ? 6 : 9,
-            height: h,
-            borderRadius: 5,
-            background: "linear-gradient(90deg,#fff 80%,#b0b0b0 100%)",
-            opacity: 0.88,
-            boxShadow: "0 1.5px 7px 0 rgba(255,255,255,0.19)",
-            transition: "height 0.17s cubic-bezier(.2,1.2,.41,.8)"
-          }}
+    <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: mobile ? 12 : 16 }}>
+      <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ overflow: 'visible' }}>
+        <defs>
+          <clipPath id={clipId}>
+            <rect x="0" y="0" width={pinPosition.x} height={height} />
+          </clipPath>
+        </defs>
+
+        {/* Background (unplayed) part of the wave */}
+        <path
+          d={wavePath}
+          fill="none"
+          stroke="rgba(255, 255, 255, 0.25)"
+          strokeWidth={mobile ? 2.5 : 3}
+          strokeLinecap="round"
         />
-      ))}
+
+        {/* Foreground (played) part of the wave */}
+        <path
+          ref={pathRef}
+          d={wavePath}
+          fill="none"
+          stroke="#fff"
+          strokeWidth={mobile ? 2.5 : 3}
+          strokeLinecap="round"
+          clipPath={`url(#${clipId})`}
+          style={{ filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.6))' }}
+        />
+
+        {/* Thumb/Pin */}
+        <circle cx={pinPosition.x} cy={pinPosition.y} r={mobile ? 4.5 : 5.5} fill="#fff" className="progress-pin" style={{ transition: 'cx 1s linear', filter: 'drop-shadow(0 0 4px rgba(255,255,255,0.8))' }} />
+      </svg>
+    </div>
+  );
+};
+
+const MarqueeText: React.FC<{ children: React.ReactNode; className?: string; style?: React.CSSProperties }> = ({ children, className, style }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLSpanElement>(null);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+
+  // Use useLayoutEffect for immediate measurement after render
+  React.useLayoutEffect(() => {
+    const checkOverflow = () => {
+      if (containerRef.current && textRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        const textWidth = textRef.current.scrollWidth;
+        const newIsOverflowing = textWidth > containerWidth;
+        if (newIsOverflowing !== isOverflowing) {
+          setIsOverflowing(newIsOverflowing);
+        }
+      }
+    };
+
+    // Check on mount and when children change
+    checkOverflow();
+
+    // Use ResizeObserver for robust overflow detection
+    const resizeObserver = new ResizeObserver(checkOverflow);
+    if (containerRef.current) resizeObserver.observe(containerRef.current);
+    return () => resizeObserver.disconnect();
+  }, [children, isOverflowing]);
+
+  return (
+    <div ref={containerRef} className="marquee-container" style={style}>
+      <div className={`marquee-content ${isOverflowing ? 'is-overflowing' : ''}`}>
+        <span ref={textRef} className={`marquee-text ${className}`}>
+          {children}
+        </span>
+        {isOverflowing && (
+          <span className={`marquee-text ${className}`} aria-hidden="true">
+            {children}
+          </span>
+        )}
+      </div>
     </div>
   );
 };
@@ -207,6 +286,24 @@ const NowListening: React.FC = () => {
 
   const t: TrackInfo = track || fallbackTrack;
   const blurStrength = mobileView ? 7 : 11;
+  const mainArtist = t.artist ? t.artist.split(',')[0].trim() : "";
+
+  const songTitleContent = useMemo(() => {
+    if (!t.name) return "";
+
+    let title = t.name;
+
+    // Remove (feat. ...) notations
+    title = title.replace(/\s+\(feat\..*?\)/i, "").trim();
+
+    // Remove text after " - " (e.g., "- From 'Movie'", "- Remix")
+    const hyphenIndex = title.indexOf(" - ");
+    if (hyphenIndex !== -1) {
+      title = title.substring(0, hyphenIndex).trim();
+    }
+
+    return title;
+  }, [t.name]);
 
   // Debug: Log when component renders and what image is used
   useEffect(() => {
@@ -276,9 +373,9 @@ const NowListening: React.FC = () => {
           <div
             className={`relative z-10 flex items-center ${mobileView ? "gap-2 px-2.5 py-2.5" : "gap-7 px-8 py-6"}`}
             style={{
-              background: "rgba(25, 28, 42, 0.55)",
-              backdropFilter: "blur(18px) saturate(1.4)",
-              WebkitBackdropFilter: "blur(18px) saturate(1.4)",
+              background: "rgba(25, 28, 42, 0.50)",
+              backdropFilter: "blur(24px) saturate(1.5)",
+              WebkitBackdropFilter: "blur(24px) saturate(1.5)",
               borderRadius: mobileView ? "1.15rem" : "1.9rem",
               border: "1.5px solid rgba(180,180,180,0.16)",
               minHeight: mobileView ? "80px" : "120px",
@@ -311,7 +408,7 @@ const NowListening: React.FC = () => {
                   boxShadow: "0 3px 11px 0 rgba(80,80,80,0.09), 0 1px 7px #fff2",
                   opacity: imgLoaded ? 1 : 0,
                   transition: "opacity .35s, transform .23s cubic-bezier(.33,1.4,.55,1)",
-                  zIndex: 2
+                zIndex: 1
                 }}
                 onLoad={() => setImgLoaded(true)}
                 tabIndex={mobileView ? -1 : 0}
@@ -345,79 +442,41 @@ const NowListening: React.FC = () => {
               >
                 {headerText}
               </ShinyText>
-              <ShinyText
-                speed={4}
-                className="truncate font-bold text-[1.15rem] md:text-[1.24rem] max-w-full relative"
+              <MarqueeText
+                className="font-bold text-[1.15rem] md:text-[1.24rem] max-w-full relative"
                 style={{
                   fontWeight: 700,
                   lineHeight: 1.17,
                   letterSpacing: "0.01em",
                 }}
               >
-                {t.name}
-              </ShinyText>
-              <ShinyText
-                speed={5}
-                className="truncate text-[1.03rem] md:text-[1.11rem] mt-1 max-w-full"
+                <ShinyText speed={6} disabled={!showVisualizer}>
+                  {songTitleContent}
+                </ShinyText>
+              </MarqueeText>
+              <MarqueeText
+                className="text-[1.03rem] md:text-[1.11rem] mt-1 max-w-full"
                 style={{
                   lineHeight: 1.13,
                   fontWeight: 500
                 }}
               >
-                {t.artist}
-              </ShinyText>
-              {showVisualizer && <BoxWideVisualizer mobile={mobileView} />}
-              {showVisualizer && track?.durationMs && (
-                <div
-                  className="progress-bar-container"
-                  style={{
-                    position: "relative",
-                    width: "100%",
-                    height: mobileView ? 3 : 4,
-                    backgroundColor: "rgba(255, 255, 255, 0.2)",
-                    borderRadius: 4,
-                    marginTop: mobileView ? 9 : 13,
-                  }}
-                >
-                  <div
-                    className="progress-bar-inner"
-                    style={{
-                      height: "100%",
-                      width: `${progress}%`,
-                      backgroundColor: "#fff",
-                      borderRadius: 4,
-                      transition: "width 1s linear",
-                      boxShadow: "0 0 10px 0 #fff8",
-                    }}
-                  />
-                  <div
-                    className="progress-bar-pin"
-                    style={{
-                      position: "absolute",
-                      top: "50%",
-                      left: `${progress}%`,
-                      width: mobileView ? 10 : 12,
-                      height: mobileView ? 10 : 12,
-                      borderRadius: "50%",
-                      backgroundColor: "#fff",
-                      transform: "translate(-50%, -50%)",
-                      transition: "left 1s linear",
-                      boxShadow: "0 0 8px 1px rgba(255, 255, 255, 0.7)",
-                    }}
-                  />
-                </div>
-              )}
+                <ShinyText speed={7} disabled={!showVisualizer}>
+                  {mainArtist}
+                </ShinyText>
+              </MarqueeText>
+              {showVisualizer && <SwigglyProgressBar progress={progress} mobile={mobileView} isPlaying={showVisualizer} />}
             </div>
             {/* Music Icon right */}
             <span style={{
               color: "#fff",
-              fontSize: mobileView ? 22 : 32,
-              marginLeft: mobileView ? 7 : 15,
+              fontSize: mobileView ? 20 : 28,
+              marginLeft: mobileView ? 4 : 12,
               filter: "drop-shadow(0 2px 6px #fff5)",
               opacity: 0.92,
               flexShrink: 0
             }}>
-              <FaMusic />
+              <FaSpotify />
             </span>
           </div>
         </div>
@@ -425,14 +484,60 @@ const NowListening: React.FC = () => {
         .box-wide-visualizer {
           user-select: none;
         }
+        .thumbnail-wrapper::after {
+          content: '';
+          position: absolute;
+          inset: -2px;
+          border-radius: inherit;
+          background: linear-gradient(45deg, rgba(255,255,255,0.6), rgba(255,255,255,0.1), rgba(255,255,255,0.6));
+          background-size: 200% 200%;
+          opacity: 0;
+          z-index: 0;
+          transition: opacity 0.3s ease, background-position 0.5s ease;
+          animation: bg-pan 4s linear infinite;
+        }
         .thumbnail-wrapper:hover .thumbnail-img,
         .thumbnail-wrapper:focus .thumbnail-img {
           transform: scale(1.06);
-          z-index: 3;
           box-shadow: 0 7px 31px #fff5, 0 2px 10px #9997;
+        }
+        .thumbnail-wrapper:hover::after {
+          opacity: 1;
         }
         .thumbnail-img {
           will-change: transform;
+        }
+        .progress-pin {
+          animation: pin-pulse 2.5s infinite ease-in-out;
+        }
+        /* --- Marquee Effect --- */
+        .marquee-container {
+          width: 100%;
+          overflow: hidden;
+        }
+        .marquee-content {
+          display: inline-block;
+          white-space: nowrap;
+        }
+        .marquee-content.is-overflowing {
+          animation: marquee 10s linear infinite;
+        }
+        .marquee-text {
+          padding-right: 2rem; /* Space between repeated text */
+        }
+        @keyframes marquee {
+          0%   { transform: translateX(0); }
+          15%  { transform: translateX(0); } /* Pause at the start */
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes bg-pan {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes pin-pulse {
+          0%, 100% { filter: drop-shadow(0 0 4px rgba(255,255,255,0.8)); }
+          50% { filter: drop-shadow(0 0 7px rgba(255,255,255,1)); }
         }
         /* --- Android 15 style: constant particles blur ripple effect --- */
         .particle-blur-bg {
