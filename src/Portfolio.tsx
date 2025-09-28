@@ -1,6 +1,6 @@
 import React from "react";
 import Navbar from "./Components/NavBar";
-import ParticlesBackground from "./Components/Particles";
+import Background from "./Components/bg";
 import Footer from "./Components/Footer";
 import SkillChip from "./Sections/Skills";
 import Projects from "./Sections/Projects";
@@ -53,7 +53,7 @@ const Portfolio: React.FC = () => {
     <div className="relative min-h-screen bg-gradient-to-b from-black via-gray-900 to-gray-950 text-white overflow-x-hidden font-sans">
       {/* Intro, particles, cursor, and navigation */}
       <Intro />
-      <ParticlesBackground />
+      <Background showParticles={true} particleCount={80} />
       <Cursor />
       <Navbar />
 
