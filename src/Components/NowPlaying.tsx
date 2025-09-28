@@ -24,12 +24,12 @@ const fallbackTrack: TrackInfo = {
   image: "https://placehold.co/120x120?text=No+Art",
   url: "#",
 };
-
-const SwigglyProgressBar: React.FC<{ progress: number; mobile?: boolean; isPlaying: boolean }> = ({ progress, mobile, isPlaying }) => {
+ 
+const SwigglyProgressBar: React.FC<{ progress: number; mobile?: boolean; isPlaying: boolean; dynamicWidth?: number }> = ({ progress, mobile, isPlaying, dynamicWidth }) => {
   const pathRef = useRef<SVGPathElement>(null);
   const [pinPosition, setPinPosition] = useState({ x: 0, y: 0 });
   const [wavePath, setWavePath] = useState('');
-  const width = mobile ? 180 : 240;
+  const width = dynamicWidth || (mobile ? 180 : 240);
   const height = mobile ? 14 : 18;
   const animationFrameRef = useRef<number>();
 
@@ -37,14 +37,14 @@ const SwigglyProgressBar: React.FC<{ progress: number; mobile?: boolean; isPlayi
     const yOffset = height / 2;
 
     // "Uniform" wave parameters
+    const waveLength = 40; // The width of one full wave cycle in pixels
     const amplitude = mobile ? 3 : 4;
-    const frequency = 5;
     const speed = 1.5;
 
     const getWavePath = (time: number) => {
       let path = `M 0 ${yOffset}`;
       for (let x = 0; x <= width; x++) {
-        const angle = (x / width) * (frequency * Math.PI * 2) + time * speed;
+        const angle = (x / waveLength) * (Math.PI * 2) + time * speed;
         const y = yOffset + amplitude * Math.sin(angle);
         path += ` L ${x} ${y}`;
       }
@@ -53,7 +53,7 @@ const SwigglyProgressBar: React.FC<{ progress: number; mobile?: boolean; isPlayi
 
     const updatePinPosition = (time: number) => {
       const pinX = width * (progress / 100);
-      const angle = (pinX / width) * (frequency * Math.PI * 2) + time * speed;
+      const angle = (pinX / waveLength) * (Math.PI * 2) + time * speed;
       const y = yOffset + amplitude * Math.sin(angle);
       const pinY = y;
       setPinPosition({ x: pinX, y: pinY });
@@ -134,6 +134,7 @@ const NowListening: React.FC = () => {
   const [headerText, setHeaderText] = useState("Now Listening");
   const [showVisualizer, setShowVisualizer] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [infoWidth, setInfoWidth] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
@@ -250,17 +251,38 @@ const NowListening: React.FC = () => {
 
     let title = t.name;
 
-    // Remove (feat. ...) notations
+    // Rule 1: Remove (feat. ...) notations specifically
     title = title.replace(/\s+\(feat\..*?\)/i, "").trim();
 
-    // Remove text after " - " (e.g., "- From 'Movie'", "- Remix")
+    // Rule 2: Remove text after " - " (e.g., "- From 'Movie'", "- Remix")
     const hyphenIndex = title.indexOf(" - ");
     if (hyphenIndex !== -1) {
       title = title.substring(0, hyphenIndex).trim();
     }
 
+    // Rule 3: Remove text in parentheses (e.g., "(Remix)", "(Title Track)")
+    const parenthesisIndex = title.indexOf(" (");
+    if (parenthesisIndex !== -1) {
+      title = title.substring(0, parenthesisIndex).trim();
+    }
+
     return title;
   }, [t.name]);
+
+  // Ref to measure the width of the text content area
+  const infoRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const measureWidth = () => {
+      if (infoRef.current) {
+        setInfoWidth(infoRef.current.offsetWidth);
+      }
+    };
+    measureWidth();
+    // Use a timeout to ensure the DOM has updated after text changes
+    const timeoutId = setTimeout(measureWidth, 50);
+    window.addEventListener('resize', measureWidth);
+    return () => { clearTimeout(timeoutId); window.removeEventListener('resize', measureWidth); };
+  }, [songTitleContent, mainArtist]); // Re-measure when text changes
 
   // Debug: Log when component renders and what image is used
   useEffect(() => {
@@ -277,7 +299,7 @@ const NowListening: React.FC = () => {
     <div
       className={`now-listening-wrapper mx-auto ${mobileView ? "mb-4" : "mb-8"}`}
       style={{
-        maxWidth: mobileView ? "calc(100% - 2rem)" : "520px",
+        maxWidth: mobileView ? "calc(100% - 2rem)" : "90vw",
         height: "auto",
         width: 'fit-content', // Adaptive width
       }}
@@ -389,7 +411,7 @@ const NowListening: React.FC = () => {
               )}
             </div>
             {/* Info block */}
-            <div className="flex flex-col min-w-0 flex-1" style={{ marginLeft: mobileView ? 10 : 22, position: "relative" }}>
+            <div ref={infoRef} className="flex flex-col" style={{ flexShrink: 0, marginLeft: mobileView ? 10 : 22, position: "relative" }}>
               <ShinyText
                 speed={5}
                 className="text-[0.75rem] uppercase tracking-widest mb-1 opacity-90"
@@ -423,7 +445,7 @@ const NowListening: React.FC = () => {
                   {mainArtist}
                 </ShinyText>
               </div>
-              {showVisualizer && <SwigglyProgressBar progress={progress} mobile={mobileView} isPlaying={showVisualizer} />}
+              {showVisualizer && <SwigglyProgressBar progress={progress} mobile={mobileView} isPlaying={showVisualizer} dynamicWidth={infoWidth} />}
             </div>
             {/* Music Icon right */}
             <span style={{
