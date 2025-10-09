@@ -1,11 +1,20 @@
 /* eslint-disable react/no-unknown-property */
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
 
+// --- Constants for better maintainability ---
 const CLICKABLE_SELECTOR = [ "a", "button", "input", "textarea", "select", "summary", "label", "[role=button]", "[tabindex]:not([tabindex='-1'])", ".cursor-pointer" ].join(", ");
 const VIEW_SELECTOR = "[data-cursor-view]";
 
+const DOT_SIZE = 9;
+const RING_SIZE = 50;
+
 const isClickable = (el: Element | null): boolean => !!el?.closest(CLICKABLE_SELECTOR);
 const isViewable = (el: Element | null): boolean => !!el?.closest(VIEW_SELECTOR);
+
+// --- Helper for initial position to avoid top-left flash ---
+const getInitialMousePos = () => {
+    return { x: -RING_SIZE, y: -RING_SIZE };
+};
 
 /**
  * Hook to detect if the user is on a touch-enabled device.
@@ -24,18 +33,12 @@ const useIsTouchDevice = () => {
  */
 const useCursor = (dotRef: React.RefObject<HTMLDivElement>, ringRef: React.RefObject<HTMLDivElement>) => {
     const isTouchDevice = useIsTouchDevice();
-    const [isVisible, setIsVisible] = useState(true);
-    const [isHovering, setIsHovering] = useState(false);
-    const [isViewing, setIsViewing] = useState(false);
-    const mouse = useRef({ x: 0, y: 0 });
-    const ringPos = useRef({ x: 0, y: 0, scale: 1 });
+    const [isVisible, setIsVisible] = useState(true); // Default to visible, handle by opacity
+    const mouse = useRef(getInitialMousePos());
+    const ringPos = useRef({ ...getInitialMousePos(), scale: 1 });
     const animationFrame = useRef<number>();
-
-    // Use a ref to get the latest hover state inside the animation loop without re-triggering the effect
-    const isHoveringRef = useRef(isHovering);
-    useEffect(() => {
-        isHoveringRef.current = isHovering;
-    }, [isHovering]);
+    const isHoveringRef = useRef(false);
+    const isViewingRef = useRef(false);
 
     // Set body attribute for CSS targeting
     useEffect(() => {
@@ -53,17 +56,29 @@ const useCursor = (dotRef: React.RefObject<HTMLDivElement>, ringRef: React.RefOb
 
         const handleMouseMove = (e: MouseEvent) => {
             mouse.current = { x: e.clientX, y: e.clientY };
+
             if (dotRef.current) {
-                dotRef.current.style.transform = `translate3d(${e.clientX - 4}px, ${e.clientY - 4}px, 0)`;
+                dotRef.current.style.transform = `translate3d(${e.clientX - DOT_SIZE / 2}px, ${e.clientY - DOT_SIZE / 2}px, 0)`;
             }
+
             const el = document.elementFromPoint(e.clientX, e.clientY);
-            setIsHovering(isClickable(el));
-            setIsViewing(isViewable(el));
+            const hovering = isClickable(el);
+            const viewing = isViewable(el);
+
+            // Imperatively update refs and classes to prevent re-renders
+            if (hovering !== isHoveringRef.current) {
+                isHoveringRef.current = hovering;
+                ringRef.current?.classList.toggle('is-hovering', hovering);
+            }
+            if (viewing !== isViewingRef.current) {
+                isViewingRef.current = viewing;
+                ringRef.current?.classList.toggle('is-viewing', viewing);
+            }
         };
 
         window.addEventListener("mousemove", handleMouseMove);
         return () => window.removeEventListener("mousemove", handleMouseMove);
-    }, [isTouchDevice, dotRef]);
+    }, [isTouchDevice, dotRef, ringRef]);
 
     // Animation loop for the ring
     useEffect(() => {
@@ -78,7 +93,7 @@ const useCursor = (dotRef: React.RefObject<HTMLDivElement>, ringRef: React.RefOb
             ringPos.current.scale = lerp(ringPos.current.scale, targetScale, 0.2);
 
             if (ringRef.current) {
-                const transform = `translate3d(${ringPos.current.x - 25}px, ${ringPos.current.y - 25}px, 0) scale(${ringPos.current.scale})`;
+                const transform = `translate3d(${ringPos.current.x - RING_SIZE / 2}px, ${ringPos.current.y - RING_SIZE / 2}px, 0) scale(${ringPos.current.scale})`;
                 ringRef.current.style.transform = transform;
             }
             animationFrame.current = requestAnimationFrame(animate);
@@ -96,11 +111,16 @@ const useCursor = (dotRef: React.RefObject<HTMLDivElement>, ringRef: React.RefOb
 
         const handleMouseLeave = () => setIsVisible(false);
         const handleMouseEnter = (e: MouseEvent) => {
-            setIsVisible(true);
             // Immediately update position on re-entry
+            mouse.current = { x: e.clientX, y: e.clientY };
+            ringPos.current = { ...mouse.current, scale: 1 };
             if (dotRef.current) {
-                dotRef.current.style.transform = `translate3d(${e.clientX - 4}px, ${e.clientY - 4}px, 0)`;
+                dotRef.current.style.transform = `translate3d(${e.clientX - DOT_SIZE / 2}px, ${e.clientY - DOT_SIZE / 2}px, 0)`;
             }
+            // Only set visible after a very short delay to avoid flicker on quick leave/enter
+            setTimeout(() => {
+                setIsVisible(true);
+            }, 16);
         };
 
         document.documentElement.addEventListener("mouseleave", handleMouseLeave);
@@ -111,19 +131,25 @@ const useCursor = (dotRef: React.RefObject<HTMLDivElement>, ringRef: React.RefOb
         };
     }, [isTouchDevice, dotRef]);
 
-    return { isTouchDevice, isVisible, isHovering, isViewing };
+    return { isTouchDevice, isVisible };
 };
 
 const Cursor: React.FC = () => {
     const dotRef = useRef<HTMLDivElement>(null);
     const ringRef = useRef<HTMLDivElement>(null);
-    const { isTouchDevice, isVisible, isHovering, isViewing } = useCursor(dotRef, ringRef);
+    const { isTouchDevice, isVisible } = useCursor(dotRef, ringRef);
+    const [isIntroActive, setIsIntroActive] = useState(true);
 
-    const introHide =
-        typeof document !== "undefined" &&
-        document.body.hasAttribute("data-intro-hide-cursor");
+    // Use useLayoutEffect to check for the attribute synchronously
+    useLayoutEffect(() => {
+        const checkIntro = () => {
+            const introIsHidingCursor = document.body.hasAttribute("data-intro-hide-cursor");
+            setIsIntroActive(introIsHidingCursor);
+        };
+        checkIntro(); // Initial check
+    }, []); // This effect runs once on mount
 
-    if (isTouchDevice || introHide) return null;
+    if (isTouchDevice) return null;
 
     return (
         <>
@@ -132,7 +158,7 @@ const Cursor: React.FC = () => {
         /* Hide native cursor when custom one is active */
         body[data-custom-cursor="yes"] {
           cursor: none;
-          --cursor-visibility: ${isVisible ? 'visible' : 'hidden'};
+          --cursor-visibility: ${isVisible && !isIntroActive ? 'visible' : 'hidden'};
         }
 
         .custom-cursor-ring {
@@ -140,13 +166,13 @@ const Cursor: React.FC = () => {
           pointer-events: none;
           border: 2px solid #fff;
           border-radius: 50%;
-          width: 50px;
-          height: 50px;
+          width: ${RING_SIZE}px;
+          height: ${RING_SIZE}px;
           /* Lerp in JS handles transform, CSS handles the rest */
           transition: border-width 0.3s, box-shadow 0.3s, background-color 0.3s;
           z-index: 9999;
           mix-blend-mode: difference;
-          /* Add the glow effect */
+          /* Glow effect */
           box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3);
           will-change: transform, opacity;
         }
@@ -183,23 +209,23 @@ const Cursor: React.FC = () => {
           pointer-events: none;
           background: #fff;
           border-radius: 50%;
-          width: 9px;
-          height: 9px;
+          width: ${DOT_SIZE}px;
+          height: ${DOT_SIZE}px;
           z-index: 10000;
           mix-blend-mode: difference;
-          /* Add a subtle glow to the dot */
+          /* Subtle glow for the dot */
           box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
           will-change: transform, opacity;
         }
 
         .custom-cursor-dot, .custom-cursor-ring {
-            opacity: ${isVisible ? 1 : 0};
+            opacity: ${isVisible && !isIntroActive ? 1 : 0};
             transition: opacity 0.3s;
             visibility: var(--cursor-visibility);
         }
       `}
             </style>
-            <div ref={ringRef} className={`custom-cursor-ring ${isHovering ? 'is-hovering' : ''} ${isViewing ? 'is-viewing' : ''}`}>
+            <div ref={ringRef} className="custom-cursor-ring">
                 <span className="custom-cursor-view">View</span>
             </div>
             <div ref={dotRef} className="custom-cursor-dot" />

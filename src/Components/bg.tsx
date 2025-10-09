@@ -199,8 +199,26 @@ const Background: React.FC<ParticlesProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`fixed top-0 left-0 w-full h-full pointer-events-none z-0 overflow-hidden ${className}`.trim()}
-    />
+      className={`fixed top-0 left-0 w-full h-full pointer-events-none z-0 overflow-hidden ${className}`.trim()}>
+      <style>{`
+        .noise-overlay::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          pointer-events: none;
+          /* Subtle noise texture for the acrylic/fluent effect */
+          background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXWBgYGHh4d5eXlzc3OLi4ubm5uVlZWPj4+NjY19fX2JiYl/f39ra2uRkZGZmZlpaWmXl5dvb29xcXGTk5NnZ2c8TV1mAAAAG3RSTlNAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAvEOwtAAAFVklEQVR4XpWWB67c2BUFb3g557T/hRo9/WUMZHlgr4Bg8Z4qQgQJlHI4A8SzFVrapvmTF9O7dmYRFZ60YiBhJRCgh1FYhiLAmdvX0CzTOpNE77ME0Zty/nWWzchDtiqrmQDeuv3powQ5ta2eN0FY0InkqDD73lT9c9lEzwUNqgFHs9VQce3TVClFCQrSTfOiYkVJQBmpbq2L6iZavPnAPcoU0dSw0SUTqz/GtrE+eYIqCqNEo2Qpd4u7toyJETIDGmcUo2LGKc2iVwiAkaFfRxNCMZIiaaAiCWKAYUBcwgF8OpVFzAKMKA+CEUBgnANAjaSDKlneEI4mGdUODsRlGeQjloOCweTwORoGgGDbtDADeIL4A6iM5iBE4RggdeI0A6g+8GBAREB7ARQhALNF2gebfMeqAaA45BTKgwE4HRaaACbA4bQApeYRAQORAYmF8CAY5I+gUARgVo1ACoH4uSsUQD1AIsoSpYARQBERADQCMA30BwFB4B6AhQNY+SRgJgBYDsOYAU4B+gAESDNADUACdDFH2_ARQLwA6gB4JGAiE3L1gURTy2AGb5HAEHnsAlw1o5AIBE0AowBl5MwCg2gA3A9MA5ABsE8AIwA3gAwkM0G2Oor7G4A264x6s8AI8rGD6RGDScGACeXAXgPQOAPg1YKA==');
+          opacity: 0.15;
+          z-index: 2;
+        }
+      `}</style>
+      <div className="noise-overlay w-full h-full">
+        {/* Canvas will be appended here by the effect */}
+      </div>
+    </div>
   );
 };
 

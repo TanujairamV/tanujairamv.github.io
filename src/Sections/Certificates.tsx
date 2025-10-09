@@ -1,110 +1,127 @@
 import React from "react";
-import { FaCertificate } from "react-icons/fa";
+import { FiAward, FiExternalLink } from "react-icons/fi";
 
-console.debug("[Debug] Certificates component file loaded");
+// --- Data ---
+// For larger projects, consider moving this to a separate file (e.g., src/data/certificates.ts)
+interface Certificate {
+  title: string;
+  issuer: string;
+  year: number;
+  image: string;
+  description: string;
+  link?: string;
+}
 
-const certificates = [
+const certificatesData: Certificate[] = [
   {
     title: "Data Science and AI Completion",
     issuer: "IIT Madras",
     year: 2024,
-    image: "ds.jpg", // Make sure ds.jpg is in your public folder
+    image: "/assets/ds.jpg", // Use a public path string
     description:
-      "Certificate awarded by IIT Madras for successfully completing the Data Science and Artificial Intelligence course.",
+      "Awarded for the successful completion of the 8-week certification course in Data Science and Artificial Intelligence.",
+    link: "https://www.schoolconnect.iitm.ac.in/", // Example link
   },
   // Add more certificates as needed
 ];
 
-const gradientTextStyle = {
-  background: "linear-gradient(90deg, #fff 70%, #b0b0b0 100%)",
-  WebkitBackgroundClip: "text",
-  WebkitTextFillColor: "transparent",
-  fontFamily: "'Space Grotesk', 'Poppins', 'Montserrat', sans-serif",
-  fontWeight: 700,
-  fontSize: "1.18rem",
-  letterSpacing: ".02em",
-  lineHeight: 1.6,
-  display: "inline-block",
-  cursor: "pointer",
-  textAlign: "center",
-  width: "100%",
-} as React.CSSProperties;
-
-const Certificates: React.FC = () => {
-  // Only show the first certificate (remove multiple boxes)
-  const cert = certificates[0];
+// --- CertificateCard Component ---
+// This component handles the display and interaction for a single certificate.
+const CertificateCard: React.FC<{ certificate: Certificate }> = ({ certificate }) => {
   const [shown, setShown] = React.useState(false);
-
-  React.useEffect(() => {
-    console.debug("[Debug] Certificates component rendered");
-    console.debug("[Debug] Certificates data:", certificates);
-  }, []);
 
   const handleToggle = () => setShown((prev) => !prev);
 
   return (
-    <div className="w-full flex justify-center items-start">
+    <div
+      className="flex flex-col items-center justify-center w-full max-w-md p-7 rounded-2xl bg-white/20 dark:bg-neutral-900/30 shadow-xl backdrop-blur-xl border border-white/10 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 select-none mt-8 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] focus:scale-[1.02]"
+      tabIndex={0}
+      onClick={handleToggle}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") handleToggle();
+      }}
+      role="button"
+      aria-pressed={shown}
+      aria-describedby="cert-helper-text"
+      aria-label={`View certificate for ${certificate.title}`}
+    >
+      {/* Title */}
       <div
-        className="flex flex-col items-center justify-center w-full max-w-md p-7 rounded-2xl bg-white/20 dark:bg-neutral-900/30 shadow-xl backdrop-blur-xl border border-white/10 group cursor-pointer"
-        tabIndex={0}
-        onClick={handleToggle}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") handleToggle();
-        }}
-        role="button"
-        aria-pressed={shown}
-        style={{
-          userSelect: "none",
-          outline: "none",
-          marginTop: "2rem",
-        }}
+        className="mb-1 w-full flex flex-row justify-center items-center gap-2 text-center text-[1.18rem] font-bold tracking-wider leading-relaxed font-grotesk bg-gradient-to-r from-white via-white to-neutral-400 bg-clip-text text-transparent"
       >
-        <div
-          className="mb-1 w-full flex flex-row justify-center items-center gap-2 text-center"
-          style={gradientTextStyle}
+        <FiAward className="text-blue-300 drop-shadow" />
+        {certificate.title}
+      </div>
+
+      {/* Issuer and Year */}
+      <div className="relative flex flex-row items-center justify-center gap-2 mb-1 w-full text-center">
+        <span className="text-gray-300 text-base font-medium">{certificate.issuer}</span>
+        <span className="text-gray-400 text-xs">·</span>
+        <span className="text-gray-400 text-xs">{certificate.year}</span>
+        {certificate.link && (
+          <a
+            href={certificate.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="group/link ml-2 text-gray-400 hover:text-blue-300 transition-colors"
+            aria-label="Verify certificate (opens in a new tab)"
+          >
+            <FiExternalLink />
+            <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-neutral-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover/link:opacity-100">
+              Verify
+            </span>
+          </a>
+        )}
+      </div>
+
+      {/* Content Area (Description or Image) */}
+      <div className="grid place-items-center w-full min-h-[85px] text-center">
+        {/* Description */}
+        <p
+          style={{ gridArea: "1 / 1" }}
+          className={`w-full px-2 py-2 font-grotesk tracking-wide text-gray-400 text-xs text-center transition-all duration-300 ease-in-out ${
+            shown ? "opacity-0 scale-95" : "opacity-100 scale-100"
+          }`}
         >
-          <FaCertificate className="text-blue-300 drop-shadow" />
-          {cert.title}
-        </div>
-        <div className="flex flex-row items-center justify-center gap-2 mb-1 w-full text-center">
-          <span className="text-gray-300 text-base font-medium">{cert.issuer}</span>
-          <span className="text-gray-400 text-xs">·</span>
-          <span className="text-gray-400 text-xs">{cert.year}</span>
-        </div>
-        <div className="flex justify-center items-center w-full min-h-[85px] text-center">
-          {!shown ? (
-            <div
-              className="text-gray-400 text-xs text-center w-full flex justify-center items-center"
-              style={{
-                fontFamily: "'Space Grotesk', 'Poppins', 'Montserrat', sans-serif",
-                fontWeight: 400,
-                letterSpacing: ".011em",
-                padding: "0.5rem 0",
-                textAlign: "center",
-              }}
-            >
-              {cert.description}
-            </div>
-          ) : (
-            <img
-              src={cert.image}
-              alt={cert.title}
-              className="max-w-xs w-full h-auto rounded-xl shadow-lg border border-white/10 transition block mx-auto"
-              style={{ marginTop: 2, background: "#fff3" }}
-              tabIndex={-1}
-              draggable={false}
-              onError={() =>
-                console.debug(`[Debug] Failed to load image: ${cert.image}`)
-              }
-            />
-          )}
-        </div>
-        <div className="text-xs text-gray-500 mt-2 select-none text-center w-full flex justify-center items-center">
-          {shown
-            ? "Click anywhere to hide certificate"
-            : "Click anywhere to view certificate"}
+          {certificate.description}
+        </p>
+
+        {/* Image */}
+        <div
+          style={{ gridArea: "1 / 1" }}
+          className={`flex items-center justify-center transition-all duration-300 ease-in-out ${
+            shown ? "opacity-100 scale-100" : "opacity-0 scale-95"
+          }`}
+        >
+          <img
+            src={certificate.image}
+            alt={certificate.title}
+            // When hidden, prevent it from being interactive or announced by screen readers
+            aria-hidden={!shown}
+            className="max-w-xs w-full h-auto rounded-xl shadow-lg border border-white/10 block mx-auto bg-white/20"
+            tabIndex={-1}
+            draggable={false}
+          />
         </div>
       </div>
+
+      {/* Helper Text */}
+      <div id="cert-helper-text" className="text-xs text-gray-500 mt-2 text-center w-full">
+        {shown ? "Click to hide certificate" : "Click to view certificate"}
+      </div>
+    </div>
+  );
+};
+
+// --- Main Certificates Component ---
+// This component is responsible for laying out all the certificate cards.
+const Certificates: React.FC = () => {
+  return (
+    <div className="w-full flex flex-col items-center justify-start">
+      {certificatesData.map((cert) => (
+        <CertificateCard key={cert.title} certificate={cert} />
+      ))}
     </div>
   );
 };
