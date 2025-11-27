@@ -4,5 +4,5 @@ Simple portfolio made with React, TailwindCSS, and Framer Motion.
 Deployed via Vercel 🚀
 
 ## Commands
-- `npm start` — Run locally
+- `npm start` — To run locally
 - `npm run build` — Build for production
