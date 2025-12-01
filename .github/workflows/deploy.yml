@@ -11,6 +11,8 @@ on:
       - 'package-lock.json'
       - '.github/workflows/deploy.yml'
 
+  workflow_dispatch:   # <<< This enables manual trigger
+
 permissions:
   contents: write
 
