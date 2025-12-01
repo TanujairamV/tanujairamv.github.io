@@ -1,6 +1,8 @@
 name: Deploy to GitHub Pages
 
 on:
+  workflow_dispatch:   # Manual trigger - can be run anytime from Actions tab
+  
   push:
     branches:
       - main
@@ -10,8 +12,6 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/deploy.yml'
-
-  workflow_dispatch:   # <<< This enables manual trigger
 
 permissions:
   contents: write
