@@ -2,7 +2,7 @@
 
 A modern, interactive portfolio website built with React, TypeScript, and cutting-edge web technologies. Features smooth animations, 3D graphics, and a responsive design.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=flat&logo=vercel)](https://vercel.com)
+[![Deployed on Github](https://img.shields.io/badge/Deployed%20on-Github-black?style=flat&logo=vercel)](https://vercel.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## ✨ Features
