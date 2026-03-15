@@ -1,6 +1,8 @@
 name: Deploy to GitHub Pages
 
 on:
+  workflow_dispatch:   # Manual trigger - can be run anytime from Actions tab
+  
   push:
     branches:
       - main

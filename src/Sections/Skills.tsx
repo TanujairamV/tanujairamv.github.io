@@ -9,45 +9,58 @@ import {
   useAnimationFrame,
 } from "framer-motion";
 import {
-  FaJs, FaPython, FaHtml5, FaCss3Alt, FaNodeJs, FaGitAlt, FaGithub,
-  FaBug, FaTerminal, FaCodeBranch, FaCogs
-} from 'react-icons/fa';
+  FiCode, FiTerminal, FiGitBranch, FiGithub, FiPlayCircle, FiGlobe, FiBox, FiServer, FiLink, FiTool, FiRefreshCw, FiUsers, FiGitMerge, FiSmartphone, FiSettings, FiZap
+} from "react-icons/fi";
 import {
-  SiTypescript, SiTailwindcss, SiExpress, SiPython
+  SiTypescript, SiTailwindcss, SiExpress
 } from 'react-icons/si';
-import { TbApi } from "react-icons/tb";
-import { MdSettingsSystemDaydream, MdSecurity, MdExtension } from "react-icons/md";
 
 const skills = [
-  "Python", "JavaScript", "TypeScript", "HTML", "CSS", "TailwindCSS", "Bash", "Selenium", "Tkinter", "Git", "GitHub", "GitHub Actions", "VS Code",
-  "REST APIs", "GitHub Pages", "Custom ROMs", "TWRP", "ADB", "Fastboot", "Node.js", "Express.js", "Open-source collaboration", "Debugging", "CI/CD workflows"
+  // Programming Languages
+  "Python", "JavaScript", "TypeScript", "HTML", "CSS", "Bash",
+  // Frameworks & Libraries
+  "Tailwind CSS", "Tkinter", "Express.js", "Selenium",
+  // Tools & Platforms
+  "Git", "GitHub", "GitHub Actions", "GitHub Pages", "VS Code", "Docker", "Node.js",
+  // Developer Skills
+  "REST API Integration", "Debugging & Troubleshooting", "CI/CD Workflow Setup", "Open-Source Collaboration", "Version Control",
+  // System & Android Tools
+  "ADB", "Fastboot", "TWRP", "Custom ROMs", "Linux System Management"
 ];
 
 const skillIconMap: Record<string, React.ReactNode> = {
-  Python: <FaPython className="text-yellow-300" />,
-  JavaScript: <FaJs className="text-yellow-400" />,
+  // Programming Languages
+  Python: <FiCode className="text-yellow-300" />,
+  JavaScript: <FiCode className="text-yellow-400" />,
   TypeScript: <SiTypescript className="text-blue-300" />,
-  HTML: <FaHtml5 className="text-orange-400" />,
-  CSS: <FaCss3Alt className="text-blue-400" />,
-  TailwindCSS: <SiTailwindcss className="text-cyan-300" />,
-  Bash: <FaTerminal className="text-green-300" />,
-  Selenium: <FaBug className="text-green-400" />,
-  Tkinter: <SiPython className="text-yellow-200" />,
-  Git: <FaGitAlt className="text-orange-500" />,
-  GitHub: <FaGithub />,
-  "GitHub Actions": <FaCodeBranch className="text-blue-400" />,
-  "VS Code": <FaTerminal className="text-blue-400" />,
-  "REST APIs": <TbApi className="text-emerald-300" />,
-  "GitHub Pages": <FaGithub className="text-purple-300" />,
-  "Custom ROMs": <MdExtension className="text-pink-400" />,
-  TWRP: <MdSettingsSystemDaydream className="text-blue-400" />,
-  ADB: <FaTerminal className="text-gray-300" />,
-  Fastboot: <FaTerminal className="text-gray-300" />,
-  "Node.js": <FaNodeJs className="text-green-600" />,
+  HTML: <FiCode className="text-orange-400" />,
+  CSS: <FiCode className="text-blue-400" />,
+  Bash: <FiTerminal className="text-gray-300" />,
+  // Frameworks & Libraries
+  "Tailwind CSS": <SiTailwindcss className="text-cyan-300" />,
+  Tkinter: <FiCode className="text-yellow-200" />,
   "Express.js": <SiExpress className="text-gray-100" />,
-  "Open-source collaboration": <FaCogs className="text-green-200" />,
-  Debugging: <FaBug className="text-red-400" />,
-  "CI/CD workflows": <MdSecurity className="text-yellow-400" />,
+  Selenium: <FiZap className="text-green-400" />,
+  // Tools & Platforms
+  Git: <FiGitBranch className="text-orange-400" />,
+  GitHub: <FiGithub className="text-gray-200" />,
+  "GitHub Actions": <FiPlayCircle className="text-cyan-400" />,
+  "GitHub Pages": <FiGlobe className="text-purple-300" />,
+  "VS Code": <FiCode className="text-blue-400" />,
+  Docker: <FiBox className="text-blue-400" />,
+  "Node.js": <FiServer className="text-green-500" />,
+  // Developer Skills
+  "REST API Integration": <FiLink className="text-emerald-300" />,
+  "Debugging & Troubleshooting": <FiTool className="text-red-400" />,
+  "CI/CD Workflow Setup": <FiRefreshCw className="text-yellow-400" />,
+  "Open-Source Collaboration": <FiUsers className="text-green-300" />,
+  "Version Control": <FiGitMerge className="text-orange-300" />,
+  // System & Android Tools
+  ADB: <FiTerminal className="text-green-400" />,
+  Fastboot: <FiZap className="text-gray-300" />,
+  TWRP: <FiSettings className="text-blue-400" />,
+  "Custom ROMs": <FiSmartphone className="text-pink-400" />,
+  "Linux System Management": <FiTerminal className="text-gray-200" />,
 };
 
 interface VelocityMapping {
@@ -241,7 +254,7 @@ const Skillchip: React.FC = () => {
         return (
           <span
             key={skill}
-            className={`inline-flex items-center gap-2 bg-foreground/10 text-foreground px-4 py-2 rounded-full text-base font-space-grotesk ${gradientTextClass} mx-2`}
+            className={`inline-flex items-center gap-2 bg-foreground/10 text-foreground px-4 py-2 rounded-full text-lg font-manrope ${gradientTextClass} mx-2`}
             title={skill}
           >
             {icon}

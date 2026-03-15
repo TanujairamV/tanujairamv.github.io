@@ -1,21 +1,29 @@
 import React from "react";
+import { ParallaxProvider } from "react-scroll-parallax";
+
+// Components
 import Navbar from "./Components/NavBar";
-import ParticlesBackground from "./Components/Particles";
+import Background from "./Components/bg";
 import Footer from "./Components/Footer";
-import SkillChip from "./Sections/Skills";
-import Projects from "./Sections/Projects";
 import Cursor from "./Components/Cursor";
 import Intro from "./Components/Intro";
 import NowPlaying from "./Components/NowPlaying";
+import ShinyText from "./Components/gradient";
+import Noise from "./Components/Noise";
+
+// Sections
 import Hero from "./Sections/Hero";
+import Skills from "./Sections/Skills";
+import Projects from "./Sections/Projects";
 import Education from "./Sections/Education";
 import Experience from "./Sections/Experience";
 import Certificates from "./Sections/Certificates";
-import ShinyText from "./Components/gradient";
+import Contact from "./Sections/Contact";
+
 import "./Styles.css";
 
 // Error Boundary for production safety
-function withErrorBoundary(Component: React.ComponentType) {
+function withErrorBoundary<P extends object>(Component: React.ComponentType<P>) {
   return class ErrorBoundary extends React.Component {
     state = { hasError: false, error: null as any };
 
@@ -23,7 +31,10 @@ function withErrorBoundary(Component: React.ComponentType) {
       return { hasError: true, error };
     }
 
-    componentDidCatch() {}
+    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+      // You can also log the error to an error reporting service
+      console.error("Uncaught error:", error, errorInfo);
+    }
 
     render() {
       if (this.state.hasError) {
@@ -34,7 +45,7 @@ function withErrorBoundary(Component: React.ComponentType) {
           </div>
         );
       }
-      return <Component {...this.props} />;
+      return <Component {...(this.props as P)} />;
     }
   };
 }
@@ -42,61 +53,72 @@ function withErrorBoundary(Component: React.ComponentType) {
 const sectionHeading = (text: string, icon?: React.ReactNode) => (
   <div className="flex items-center gap-2 mb-6">
     {icon}
-    <ShinyText speed={5} className="text-2xl font-bold font-hatton">
+    <ShinyText speed={5} className="text-4xl font-bold font-manrope">
       {text}
     </ShinyText>
   </div>
 );
 
+interface SectionProps {
+  id: string;
+  title: string;
+  children: React.ReactNode;
+  className?: string;
+}
+
+const Section: React.FC<SectionProps> = ({ id, title, children, className = "mb-20" }) => (
+  <section id={id} className={className}>
+    {sectionHeading(title)}
+    {children}
+  </section>
+);
+
 const Portfolio: React.FC = () => {
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-black via-gray-900 to-gray-950 text-white overflow-x-hidden font-sans">
-      {/* Intro, particles, cursor, and navigation */}
-      <Intro />
-      <ParticlesBackground />
-      <Cursor />
-      <Navbar />
+    <ParallaxProvider>
+      <div className="relative min-h-screen bg-black text-white overflow-x-hidden font-manrope">
+        {/* Intro, particles, cursor, and navigation */}
+        <Intro />
+        <Background showParticles={true} particleCount={30} />
+        <Cursor />
+        <Navbar />
+        <Noise patternAlpha={8} />
 
-      <main className="relative z-10 w-full max-w-5xl mx-auto pt-24 pb-16 px-4 md:px-8 flex flex-col gap-14">
-        <Hero />
+        <main className="relative z-10 w-full max-w-7xl mx-auto pt-24 pb-16 px-4 md:px-8 flex flex-col gap-14">
+          <Hero />
 
-        {/* Now Playing */}
-        <div className="flex justify-center mb-12">
-          <NowPlaying />
-        </div>
+          {/* Now Playing */}
+          <div className="flex justify-center mb-12">
+            <NowPlaying />
+          </div>
 
-        {/* Skills */}
-        <section id="skills" className="mb-20">
-          {sectionHeading("Skills")}
-          <SkillChip />
-        </section>
+          <Section id="skills" title="Skills">
+            <Skills />
+          </Section>
 
-        {/* Experience */}
-        <section id="experience" className="mb-20">
-          {sectionHeading("Experience")}
-          <Experience />
-        </section>
+          <Section id="experience" title="Experience">
+            <Experience />
+          </Section>
 
-        {/* Education */}
-        <section id="education" className="mb-20">
-          {sectionHeading("Education")}
-          <Education />
-        </section>
+          <Section id="education" title="Education">
+            <Education />
+          </Section>
 
-        {/* Certificates */}
-        <section id="certificates" className="mb-20">
-          {sectionHeading("Certificates")}
-          <Certificates />
-        </section>
+          <Section id="certificates" title="Certificates">
+            <Certificates />
+          </Section>
 
-        {/* Projects */}
-        <section id="projects" className="mb-20">
-          {sectionHeading("Projects")}
-          <Projects />
-        </section>
-      </main>
-      <Footer />
-    </div>
+          <Section id="projects" title="Projects">
+            <Projects />
+          </Section>
+
+          <Section id="contact" title="Contact" className="mb-10">
+            <Contact />
+          </Section>
+        </main>
+        <Footer />
+      </div>
+    </ParallaxProvider>
   );
 };
 
