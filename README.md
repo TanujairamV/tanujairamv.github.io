@@ -1,4 +1,4 @@
-# 🚀 Tanujairam's Portfolio
+# Rohan's Portfolio
 
 A modern, interactive portfolio website built with React, TypeScript, and cutting-edge web technologies. Features smooth animations, 3D graphics, and a responsive design.
 
