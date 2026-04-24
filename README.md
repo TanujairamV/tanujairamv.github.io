@@ -19,22 +19,26 @@ A modern, interactive portfolio website built with React, TypeScript, and cuttin
 ## 🛠️ Tech Stack
 
 ### Core
+
 - **React 18** — Modern UI library with hooks and concurrent features
 - **TypeScript** — Type-safe JavaScript for better developer experience
 - **Vite** — Lightning-fast build tool and dev server
 
 ### Styling & Animation
+
 - **TailwindCSS** — Utility-first CSS framework
 - **Framer Motion** — Production-ready animation library
 - **AOS** — Animate On Scroll library
 
 ### 3D & Graphics
+
 - **Three.js** — 3D graphics library
 - **React Three Fiber** — React renderer for Three.js
 - **@react-three/drei** — Useful helpers for React Three Fiber
 - **OGL** — Minimal WebGL library
 
 ### Additional Libraries
+
 - **EmailJS** — Email service integration
 - **Lenis** — Smooth scroll library
 - **React Icons & Lucide React** — Icon libraries
@@ -43,6 +47,7 @@ A modern, interactive portfolio website built with React, TypeScript, and cuttin
 - **React Scroll Parallax** — Parallax effects
 
 ### Monitoring & Quality
+
 - **Sentry** — Error tracking and performance monitoring
 - **ESLint** — Code linting
 - **Prettier** — Code formatting
@@ -51,23 +56,26 @@ A modern, interactive portfolio website built with React, TypeScript, and cuttin
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
+- Node.js ()(v16 or higher))
 - npm or yarn
 
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/TanujairamV/tanujairamv.github.io.git
 cd tanujairamv.github.io
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Start the development server:
+
 ```bash
 npm start
 ```
@@ -76,14 +84,14 @@ The site will be available at `http://localhost:5173`
 
 ## 🎯 Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm start` | Start development server with hot reload |
-| `npm run build` | Build optimized production bundle |
-| `npm run preview` | Preview production build locally |
-| `npm run lint` | Run ESLint to check code quality |
-| `npm run format` | Format code with Prettier |
-| `npm run deploy` | Deploy to GitHub Pages |
+| Command             | Description                              |
+| ------------------- | ---------------------------------------- |
+| `npm start`       | Start development server with hot reload |
+| `npm run build`   | Build optimized production bundle        |
+| `npm run preview` | Preview production build locally         |
+| `npm run lint`    | Run ESLint to check code quality         |
+| `npm run format`  | Format code with Prettier                |
+| `npm run deploy`  | Deploy to GitHub Pages                   |
 
 ## 📁 Project Structure
 
